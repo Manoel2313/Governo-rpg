@@ -717,7 +717,7 @@
     </div>
     <script>
         // ========================================================================
-        //  GOVERNIA — JAVASCRIPT COMPLETO (CORRIGIDO)
+        //  GOVERNIA — JAVASCRIPT COMPLETO (CORRIGIDO E REESTRUTURADO)
         // ========================================================================
 
         // ===== DADOS DOS SISTEMAS (ENCICLOPÉDIA) =====
@@ -910,9 +910,7 @@
             consequenciasPendentes: [],
             escolhaAtual: null,
             decidiu: false,
-            // Novo flag para controle da enciclopédia
             enciclopediaConcluida: false,
-            // Índice da seção atual da enciclopédia
             enciclopediaIndice: 0
         };
 
@@ -1293,10 +1291,8 @@
             const container = document.getElementById('encyc-content');
             container.innerHTML = secao.render();
 
-            // Atualizar progresso
             document.getElementById('encyc-progresso').textContent = `Seção ${idx+1} de ${total}`;
 
-            // Botões de navegação
             const btnVoltar = document.getElementById('encyc-voltar');
             const btnProximo = document.getElementById('encyc-proximo');
             btnVoltar.disabled = (idx === 0);
@@ -1308,7 +1304,7 @@
                 btnProximo.disabled = false;
             }
 
-            // Listener para o botão "COMEÇAR JOGO" na última seção (se existir)
+            // Listener para o botão "COMEÇAR JOGO" na última seção
             const btnComecar = document.getElementById('btn-comecar-jogo');
             if (btnComecar) {
                 btnComecar.addEventListener('click', function() {
@@ -1365,7 +1361,6 @@
                 enciclopediaConcluida: false,
                 enciclopediaIndice: 0
             };
-            // Ir para a enciclopédia
             mudarTela('encyc');
             renderEnciclopedia();
             salvarJogo();
@@ -1473,16 +1468,20 @@
             container.innerHTML = html;
         }
 
-        // ===== EVENT LISTENERS =====
-        document.addEventListener('DOMContentLoaded', function() {
+        // ===== INICIALIZAÇÃO DOS EVENTOS =====
+        function init() {
+            // Verificar save
             verificarSave();
 
-            // Menu: botão JOGAR
-            document.getElementById('btn-jogar').addEventListener('click', function() {
-                // Se houver save, podemos perguntar se quer continuar? O fluxo pede para ir para a enciclopédia.
-                // Vamos reiniciar o jogo (novo jogo) e ir para a enciclopédia.
-                iniciarNovoJogo();
-            });
+            // Botão JOGAR
+            const btnJogar = document.getElementById('btn-jogar');
+            if (btnJogar) {
+                btnJogar.addEventListener('click', function() {
+                    iniciarNovoJogo();
+                });
+            } else {
+                console.error('Botão JOGAR não encontrado!');
+            }
 
             // Enciclopédia: navegação
             document.getElementById('encyc-proximo').addEventListener('click', avancarEnciclopedia);
@@ -1550,12 +1549,21 @@
             // Comparacao
             document.getElementById('comparacao-voltar').addEventListener('click', () => mudarTela('menu'));
 
-            // Atualizar save indicator
+            // Atualizar bandeira
+            atualizarBandeira();
+
+            // Atualizar save indicator periodicamente
             setInterval(verificarSave, 5000);
 
-            // Inicializar bandeira
-            atualizarBandeira();
-        });
+            console.log('GOVERNIA inicializado com sucesso!');
+        }
+
+        // Inicializar quando o DOM estiver pronto
+        if (document.readyState === 'loading') {
+            document.addEventListener('DOMContentLoaded', init);
+        } else {
+            init();
+        }
     </script>
 </body>
 </html>
