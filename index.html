@@ -1,1813 +1,1796 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Karma: Governando Nações</title>
-    <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-            user-select: none;
-        }
-
-        body {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background: #0b0e14;
-            color: #eaeef2;
-            height: 100vh;
-            width: 100vw;
-            overflow: hidden;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-        }
-
-        #game-container {
-            width: 100vw;
-            height: 100vh;
-            max-width: 100%;
-            max-height: 100%;
-            background: #141a24;
-            border-radius: 0;
-            box-shadow: none;
-            display: flex;
-            flex-direction: column;
-            overflow: hidden;
-            position: relative;
-        }
-
-        /* TELAS */
-        .screen {
-            display: none;
-            flex-direction: column;
-            flex: 1;
-            padding: 2vh 2vw;
-            overflow-y: auto;
-            background: #141a24;
-            position: relative;
-        }
-
-        .screen.active {
-            display: flex;
-        }
-
-        /* SCROLL */
-        .screen::-webkit-scrollbar {
-            width: 6px;
-        }
-        .screen::-webkit-scrollbar-thumb {
-            background: #3a4a5e;
-            border-radius: 10px;
-        }
-
-        /* TÍTULOS */
-        h1 {
-            font-size: 5vh;
-            font-weight: 700;
-            color: #f0c27a;
-            text-align: center;
-            margin: 1vh 0;
-            letter-spacing: 2px;
-            text-shadow: 0 2px 10px rgba(240, 194, 122, 0.3);
-        }
-
-        h2 {
-            font-size: 3.5vh;
-            font-weight: 600;
-            color: #b8c7d9;
-            text-align: center;
-            margin: 1vh 0;
-        }
-
-        h3 {
-            font-size: 2.8vh;
-            font-weight: 500;
-            color: #d0dce8;
-            margin: 1vh 0;
-        }
-
-        p {
-            font-size: 2.4vh;
-            line-height: 1.4;
-            color: #c8d4e0;
-            margin: 0.5vh 0;
-        }
-
-        /* BOTÕES GERAIS */
-        .btn {
-            background: #2a3a4e;
-            border: none;
-            border-radius: 12px;
-            color: #f0f4f8;
-            font-size: 2.6vh;
-            font-weight: 600;
-            padding: 1.8vh 2.5vw;
-            margin: 0.8vh 0.5vw;
-            cursor: pointer;
-            transition: all 0.15s ease;
-            box-shadow: 0 4px 0 #0d141c;
-            text-align: center;
-            min-width: 12vw;
-            display: inline-flex;
-            align-items: center;
-            justify-content: center;
-            letter-spacing: 0.5px;
-            flex: 1 1 auto;
-        }
-
-        .btn:hover {
-            transform: translateY(-2px);
-            filter: brightness(1.15);
-            box-shadow: 0 6px 0 #0d141c;
-        }
-
-        .btn:active {
-            transform: translateY(4px);
-            box-shadow: 0 0px 0 #0d141c;
-        }
-
-        .btn-primary {
-            background: #e8b84c;
-            color: #1a1f2a;
-            box-shadow: 0 4px 0 #a8842e;
-        }
-
-        .btn-primary:hover {
-            background: #f0c86a;
-        }
-
-        .btn-success {
-            background: #4caf84;
-            color: #0f1a1a;
-            box-shadow: 0 4px 0 #2d7a5e;
-        }
-
-        .btn-danger {
-            background: #d45c5c;
-            color: #1a0f0f;
-            box-shadow: 0 4px 0 #8f3a3a;
-        }
-
-        .btn-warning {
-            background: #d4a054;
-            color: #1a150f;
-            box-shadow: 0 4px 0 #8f6a2e;
-        }
-
-        .btn-info {
-            background: #5a8cbf;
-            color: #0f141a;
-            box-shadow: 0 4px 0 #2f5a7a;
-        }
-
-        .btn-secondary {
-            background: #4a5a6e;
-            color: #eaf0f6;
-            box-shadow: 0 4px 0 #2a3a4e;
-        }
-
-        .btn-lg {
-            font-size: 3.2vh;
-            padding: 2.2vh 3vw;
-        }
-
-        .btn-block {
-            width: 100%;
-            flex: none;
-        }
-
-        .btn-group {
-            display: flex;
-            flex-wrap: wrap;
-            justify-content: center;
-            gap: 1.2vh 1.2vw;
-            margin: 1.5vh 0;
-        }
-
-        .btn-group .btn {
-            flex: 1 1 20%;
-            min-width: 14vw;
-        }
-
-        /* INDICADORES */
-        #indicators {
-            display: flex;
-            flex-wrap: wrap;
-            justify-content: space-around;
-            background: #1e2836;
-            border-radius: 14px;
-            padding: 1.2vh 1vw;
-            margin: 1vh 0;
-            border: 1px solid #2e4056;
-        }
-
-        .indicator {
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            padding: 0.5vh 1vw;
-            min-width: 10vw;
-        }
-
-        .indicator-label {
-            font-size: 1.8vh;
-            font-weight: 500;
-            color: #a0b8cc;
-            text-transform: uppercase;
-            letter-spacing: 0.5px;
-        }
-
-        .indicator-value {
-            font-size: 2.8vh;
-            font-weight: 700;
-            color: #f0f4fa;
-            margin-top: 0.2vh;
-        }
-
-        .indicator-value.karma {
-            color: #f0c27a;
-            font-size: 3.6vh;
-        }
-
-        .indicator-bar {
-            width: 100%;
-            height: 1.2vh;
-            background: #2a3a4e;
-            border-radius: 10px;
-            margin-top: 0.5vh;
-            overflow: hidden;
-        }
-
-        .indicator-bar-fill {
-            height: 100%;
-            border-radius: 10px;
-            transition: width 0.4s ease;
-        }
-
-        .fill-karma {
-            background: linear-gradient(90deg, #d45c5c, #f0c27a, #4caf84);
-        }
-        .fill-economy {
-            background: #4caf84;
-        }
-        .fill-respect {
-            background: #e8b84c;
-        }
-        .fill-quality {
-            background: #5a8cbf;
-        }
-        .fill-stability {
-            background: #b87ad4;
-        }
-        .fill-relations {
-            background: #6fc2d4;
-        }
-
-        /* BANDEIRA MINI */
-        .flag-mini {
-            width: 5vw;
-            height: 3.5vw;
-            border: 2px solid #4a5a6e;
-            border-radius: 6px;
-            overflow: hidden;
-            display: inline-block;
-            vertical-align: middle;
-            margin: 0 0.5vw;
-        }
-
-        .flag-mini canvas {
-            width: 100%;
-            height: 100%;
-            display: block;
-        }
-
-        /* TELA DE CRIAÇÃO */
-        #creation-screen .form-group {
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            margin: 1.2vh 0;
-        }
-
-        #creation-screen .form-group label {
-            font-size: 2.8vh;
-            font-weight: 500;
-            color: #d0dce8;
-            margin-bottom: 0.8vh;
-        }
-
-        .virtual-keyboard {
-            display: flex;
-            flex-wrap: wrap;
-            justify-content: center;
-            gap: 0.6vh 0.6vw;
-            max-width: 80vw;
-            margin: 0.8vh auto;
-        }
-
-        .virtual-keyboard .key {
-            background: #2a3a4e;
-            color: #f0f4f8;
-            border: none;
-            border-radius: 8px;
-            padding: 1.2vh 1.2vw;
-            font-size: 2.6vh;
-            font-weight: 600;
-            cursor: pointer;
-            min-width: 3.5vw;
-            text-align: center;
-            transition: 0.1s;
-            box-shadow: 0 2px 0 #0d141c;
-        }
-
-        .virtual-keyboard .key:hover {
-            background: #3a5068;
-            transform: translateY(-1px);
-        }
-
-        .virtual-keyboard .key:active {
-            transform: translateY(3px);
-            box-shadow: none;
-        }
-
-        .virtual-keyboard .key-space {
-            min-width: 12vw;
-        }
-
-        .virtual-keyboard .key-back {
-            background: #6a4a4a;
-        }
-
-        #name-display {
-            font-size: 4vh;
-            font-weight: 700;
-            background: #1e2836;
-            padding: 0.8vh 2vw;
-            border-radius: 12px;
-            min-width: 30vw;
-            text-align: center;
-            color: #f0c27a;
-            border: 2px solid #3a4a5e;
-            margin: 0.5vh 0;
-            min-height: 7vh;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-        }
-
-        /* EDITOR DE BANDEIRA */
-        .flag-editor {
-            display: flex;
-            flex-wrap: wrap;
-            justify-content: center;
-            align-items: center;
-            gap: 2vw;
-            margin: 1.5vh 0;
-        }
-
-        .flag-editor canvas {
-            border: 3px solid #4a5a6e;
-            border-radius: 12px;
-            cursor: pointer;
-            width: 28vw;
-            height: 18vw;
-            background: #1a1f2a;
-        }
-
-        .flag-controls {
-            display: flex;
-            flex-direction: column;
-            gap: 1.2vh;
-            align-items: center;
-        }
-
-        .flag-controls .color-picker {
-            display: flex;
-            gap: 0.8vw;
-            flex-wrap: wrap;
-            justify-content: center;
-        }
-
-        .flag-controls .color-picker .color-swatch {
-            width: 4vw;
-            height: 4vw;
-            border-radius: 50%;
-            border: 2px solid #4a5a6e;
-            cursor: pointer;
-            transition: 0.15s;
-        }
-
-        .flag-controls .color-picker .color-swatch:hover {
-            transform: scale(1.1);
-            border-color: #f0c27a;
-        }
-
-        .flag-controls .color-picker .color-swatch.selected {
-            border: 4px solid #f0c27a;
-            box-shadow: 0 0 12px rgba(240, 194, 122, 0.5);
-        }
-
-        .flag-controls .symbol-picker {
-            display: flex;
-            gap: 1vw;
-        }
-
-        .flag-controls .symbol-picker .sym-btn {
-            background: #2a3a4e;
-            border: 2px solid #4a5a6e;
-            border-radius: 10px;
-            padding: 0.8vh 1.2vw;
-            font-size: 3.6vh;
-            cursor: pointer;
-            color: #f0f4f8;
-            transition: 0.15s;
-            min-width: 4vw;
-            text-align: center;
-        }
-
-        .flag-controls .symbol-picker .sym-btn:hover {
-            background: #3a5068;
-            border-color: #f0c27a;
-        }
-
-        .flag-controls .symbol-picker .sym-btn.active {
-            border-color: #f0c27a;
-            background: #3a4a5e;
-        }
-
-        /* TELA DE JOGO */
-        #game-screen .top-bar {
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            background: #1e2836;
-            border-radius: 14px;
-            padding: 0.8vh 1.5vw;
-            margin-bottom: 1.5vh;
-            border: 1px solid #2e4056;
-            flex-wrap: wrap;
-        }
-
-        #game-screen .top-bar .nation-info {
-            display: flex;
-            align-items: center;
-            gap: 1.2vw;
-        }
-
-        #game-screen .top-bar .nation-info .flag-mini {
-            width: 4vw;
-            height: 2.8vw;
-        }
-
-        #game-screen .top-bar .nation-info .nation-name {
-            font-size: 3.2vh;
-            font-weight: 700;
-            color: #f0c27a;
-        }
-
-        #game-screen .top-bar .turn-info {
-            font-size: 2.6vh;
-            color: #b0c4d8;
-            font-weight: 500;
-        }
-
-        .event-card {
-            background: #1e2836;
-            border-radius: 16px;
-            padding: 2vh 2vw;
-            margin: 1vh 0;
-            border-left: 6px solid #f0c27a;
-            flex: 1;
-        }
-
-        .event-card .event-title {
-            font-size: 3.6vh;
-            font-weight: 700;
-            color: #f0c27a;
-            margin-bottom: 0.8vh;
-        }
-
-        .event-card .event-desc {
-            font-size: 2.8vh;
-            color: #d0dce8;
-            margin-bottom: 1.5vh;
-            line-height: 1.4;
-        }
-
-        .options-grid {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 1.2vh 1.2vw;
-            margin: 1.5vh 0;
-        }
-
-        .options-grid .btn {
-            font-size: 2.6vh;
-            padding: 2vh 1vw;
-            min-height: 8vh;
-            white-space: normal;
-            word-break: break-word;
-            text-align: left;
-            justify-content: flex-start;
-            flex: none;
-            width: 100%;
-        }
-
-        .result-box {
-            background: #1a2430;
-            border-radius: 14px;
-            padding: 1.5vh 2vw;
-            margin: 1vh 0;
-            border: 1px solid #3a4a5e;
-        }
-
-        .result-box .result-item {
-            font-size: 2.4vh;
-            padding: 0.4vh 0;
-            color: #d0dce8;
-        }
-
-        .result-box .result-item .positive {
-            color: #4caf84;
-        }
-        .result-box .result-item .negative {
-            color: #d45c5c;
-        }
-        .result-box .result-item .neutral {
-            color: #e8b84c;
-        }
-
-        /* TELA DE GUERRA */
-        .war-panel {
-            background: #1e1a1a;
-            border-radius: 16px;
-            padding: 2vh 2vw;
-            border: 2px solid #d45c5c;
-            margin: 1vh 0;
-        }
-
-        .war-panel .war-title {
-            font-size: 4vh;
-            font-weight: 700;
-            color: #d45c5c;
-            text-align: center;
-        }
-
-        .war-panel .war-info {
-            font-size: 2.8vh;
-            color: #e0d0d0;
-            text-align: center;
-            margin: 1vh 0;
-        }
-
-        /* RESPONSIVO */
-        @media (max-width: 768px) {
-            h1 {
-                font-size: 4vh;
-            }
-            h2 {
-                font-size: 2.8vh;
-            }
-            .btn {
-                font-size: 2.2vh;
-                padding: 1.4vh 1.5vw;
-                min-width: 20vw;
-            }
-            .options-grid {
-                grid-template-columns: 1fr;
-            }
-            .flag-editor canvas {
-                width: 60vw;
-                height: 40vw;
-            }
-            .flag-controls .color-picker .color-swatch {
-                width: 6vw;
-                height: 6vw;
-            }
-            #indicators {
-                flex-wrap: wrap;
-            }
-            .indicator {
-                min-width: 20vw;
-            }
-        }
-
-        /* ANIMAÇÃO */
-        .fade-in {
-            animation: fadeIn 0.3s ease;
-        }
-
-        @keyframes fadeIn {
-            from {
-                opacity: 0;
-                transform: translateY(10px);
-            }
-            to {
-                opacity: 1;
-                transform: translateY(0);
-            }
-        }
-
-        /* OCULTAR SCROLL */
-        .no-scrollbar::-webkit-scrollbar {
-            width: 0px;
-        }
-        .no-scrollbar {
-            scrollbar-width: none;
-        }
-    </style>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>Karma: Governando Nações</title>
+<style>
+  :root{
+    --bg:#0e141e;
+    --bg2:#141c2a;
+    --card:#1a2333;
+    --card2:#212c40;
+    --gold:#e8c87a;
+    --gold-dim:#a98f56;
+    --text:#eef1f6;
+    --text-dim:#9aa7bd;
+    --green:#4caf50;
+    --red:#e74c3c;
+    --blue:#4a90d9;
+    --purple:#9b59b6;
+    --cyan:#00bcd4;
+    --yellow:#e8c435;
+    --lightblue:#5dade2;
+  }
+  *{box-sizing:border-box; margin:0; padding:0;}
+  html,body{
+    width:100%; height:100%; background:var(--bg); color:var(--text);
+    font-family:'Segoe UI', Arial, sans-serif; overflow:hidden;
+  }
+  body{ position:fixed; inset:0; }
+  #app{ width:100vw; height:100vh; position:relative; }
+
+  .screen{
+    display:none; width:100%; height:100%; position:absolute; inset:0;
+    overflow-y:auto; overflow-x:hidden;
+    padding:2vh 3vw;
+  }
+  .screen.active{ display:flex; flex-direction:column; animation:fadeIn 0.45s ease; }
+  @keyframes fadeIn{ from{opacity:0; transform:translateY(1.5vh);} to{opacity:1; transform:translateY(0);} }
+  .hidden{ display:none !important; }
+
+  h1,h2,h3{ color:var(--gold); font-weight:700; letter-spacing:0.5px; }
+  h1{ font-size:4.2vh; }
+  h2{ font-size:3.2vh; }
+  h3{ font-size:2.4vh; }
+  p, span, div{ font-size:2vh; }
+
+  .btn{
+    background:linear-gradient(180deg, var(--card2), var(--card));
+    border:2px solid #34405a;
+    color:var(--text);
+    border-radius:1.2vh;
+    padding:1.8vh 2.4vw;
+    font-size:2.1vh;
+    font-weight:600;
+    cursor:pointer;
+    transition:all 0.15s ease;
+    box-shadow:0 0.4vh 0 rgba(0,0,0,0.35);
+  }
+  .btn:hover{ transform:translateY(-0.3vh); box-shadow:0 0.8vh 1.2vh rgba(232,200,122,0.15); border-color:var(--gold-dim); }
+  .btn:active{ transform:translateY(0.1vh); box-shadow:0 0.1vh 0 rgba(0,0,0,0.3); }
+  .btn.selected{ background:linear-gradient(180deg, var(--gold), var(--gold-dim)); color:#1a1305; border-color:var(--gold); }
+  .btn.big{ font-size:2.6vh; padding:2.4vh 4vw; }
+  .btn.primary{ background:linear-gradient(180deg, var(--gold), #c9a860); color:#1a1305; border-color:var(--gold); }
+  .btn.danger{ background:linear-gradient(180deg, #8a2b2b, #5c1c1c); border-color:#a53f3f; }
+  .btn:disabled{ opacity:0.4; cursor:not-allowed; transform:none; }
+  .btn.small{ font-size:1.7vh; padding:1.2vh 1.6vw; }
+
+  .row{ display:flex; flex-wrap:wrap; gap:1.4vh; }
+  .col{ display:flex; flex-direction:column; gap:1.4vh; }
+  .center{ align-items:center; justify-content:center; text-align:center; }
+  .grow{ flex:1; }
+  .card{
+    background:linear-gradient(180deg, var(--card2), var(--card));
+    border:1px solid #2c374d;
+    border-radius:1.6vh;
+    padding:2.4vh 2.4vw;
+    box-shadow:0 0.6vh 1.6vh rgba(0,0,0,0.35);
+  }
+
+  /* ---- Creation screen ---- */
+  #tela-criacao{ gap:2vh; }
+  .etapas-nav{ display:flex; justify-content:center; gap:1vw; margin-bottom:1vh; }
+  .etapa-dot{
+    width:2vh; height:2vh; border-radius:50%; background:#2c374d; border:2px solid #34405a;
+  }
+  .etapa-dot.ativa{ background:var(--gold); border-color:var(--gold); }
+  .etapa-dot.concluida{ background:var(--green); border-color:var(--green); }
+
+  .etapa-conteudo{ flex:1; display:none; flex-direction:column; gap:2vh; align-items:center; overflow-y:auto; padding-bottom:2vh;}
+  .etapa-conteudo.ativa{ display:flex; }
+
+  #nome-display{
+    font-size:4vh; color:var(--gold); min-height:6vh; letter-spacing:2px;
+    border-bottom:0.3vh solid var(--gold-dim); padding:1vh 4vw; min-width:40vw; text-align:center;
+  }
+  #teclado{ display:grid; grid-template-columns:repeat(10, 1fr); gap:0.8vh; max-width:80vw; }
+  #teclado .btn{ padding:1.4vh 0; font-size:2vh; }
+  #teclado .btn.wide{ grid-column:span 3; }
+
+  .opcoes-grandes{ display:flex; flex-wrap:wrap; gap:1.6vh; justify-content:center; max-width:85vw; }
+  .opcoes-grandes .btn{ min-width:16vw; }
+
+  #canvas-bandeira{ border:0.4vh solid var(--gold-dim); border-radius:0.8vh; cursor:pointer; background:#000; }
+  .paleta{ display:flex; flex-wrap:wrap; gap:0.8vh; max-width:60vw; justify-content:center; }
+  .cor-swatch{
+    width:4.4vh; height:4.4vh; border-radius:0.8vh; border:2px solid #34405a; cursor:pointer;
+  }
+  .cor-swatch.selecionada{ border-color:var(--gold); transform:scale(1.1); box-shadow:0 0 1vh var(--gold); }
+  .simbolo-btn{ font-size:2.6vh; padding:1.2vh 1.6vw; }
+
+  .bandeira-mini{ border:1px solid #34405a; border-radius:0.4vh; vertical-align:middle; }
+
+  /* ---- Resumo screen ---- */
+  #tela-resumo{ align-items:center; justify-content:center; gap:3vh; }
+  .badges{ display:flex; gap:1.6vw; flex-wrap:wrap; justify-content:center; }
+  .badge{ background:var(--card); border:1px solid #34405a; border-radius:1.2vh; padding:1.6vh 2vw; text-align:center; min-width:14vw; }
+  .badge .valor{ font-size:3.4vh; color:var(--gold); font-weight:700; }
+
+  /* ---- Main game screen ---- */
+  #tela-jogo{ padding:1.6vh 2vw; gap:1.4vh; }
+  .topbar{
+    display:flex; justify-content:space-between; align-items:center;
+    background:var(--card); border-radius:1.2vh; padding:1.2vh 2vw; border:1px solid #2c374d;
+  }
+  .topbar-left{ display:flex; align-items:center; gap:1.2vw; }
+  .topbar-nome{ font-size:2.4vh; color:var(--gold); font-weight:700; }
+  .topbar-sub{ font-size:1.6vh; color:var(--text-dim); }
+  .topbar-turno{ font-size:2.2vh; color:var(--gold); font-weight:700; }
+
+  .indicadores-grid{
+    display:grid; grid-template-columns:repeat(4, 1fr); gap:1vh;
+  }
+  .indicador{
+    background:var(--card); border:1px solid #2c374d; border-radius:1vh; padding:0.9vh 1vw;
+  }
+  .indicador-topo{ display:flex; justify-content:space-between; font-size:1.6vh; margin-bottom:0.5vh; }
+  .indicador-nome{ color:var(--text-dim); }
+  .indicador-valor{ color:var(--text); font-weight:700; }
+  .indicador-barra{ width:100%; height:1.2vh; background:#0e141e; border-radius:1vh; overflow:hidden; border:1px solid #2c374d; }
+  .indicador-fill{ height:100%; transition:width 0.5s ease, background 0.5s ease; }
+  .indicador.mudou-pos{ box-shadow:0 0 1vh var(--green); }
+  .indicador.mudou-neg{ box-shadow:0 0 1vh var(--red); }
+
+  .evento-card{ flex:1; display:flex; flex-direction:column; gap:1.4vh; overflow-y:auto; }
+  .evento-titulo{ display:flex; align-items:center; gap:1vw; }
+  .evento-emoji{ font-size:4vh; }
+  .evento-desc{ font-size:2.2vh; color:var(--text); line-height:1.5; }
+  .evento-opcoes{ display:grid; grid-template-columns:1fr 1fr; gap:1.2vh; }
+  .opcao-btn{ text-align:left; font-size:1.9vh; line-height:1.35; padding:1.6vh 1.6vw; }
+  .opcao-btn.escolhida{ background:linear-gradient(180deg, var(--gold), var(--gold-dim)); color:#1a1305; }
+  .resultado-box{
+    background:var(--bg2); border:1px solid var(--gold-dim); border-radius:1vh; padding:1.4vh 1.6vw;
+    display:flex; flex-direction:column; gap:0.6vh;
+  }
+  .efeito-tag{
+    display:inline-block; padding:0.4vh 1vw; border-radius:2vh; font-size:1.7vh; margin:0.2vh; font-weight:700;
+  }
+  .efeito-pos{ background:rgba(76,175,80,0.2); color:#7bd881; border:1px solid #4caf50; }
+  .efeito-neg{ background:rgba(231,76,60,0.2); color:#f08a7e; border:1px solid #e74c3c; }
+
+  .footer-jogo{ display:flex; justify-content:space-between; gap:1vw; }
+
+  .historico-painel{
+    position:absolute; right:1.5vw; top:9vh; bottom:2vh; width:26vw; background:var(--card);
+    border:1px solid var(--gold-dim); border-radius:1.2vh; padding:1.6vh; overflow-y:auto; z-index:20;
+    box-shadow:-0.5vw 0 2vh rgba(0,0,0,0.5);
+  }
+  .historico-item{ border-bottom:1px solid #2c374d; padding:0.8vh 0; font-size:1.7vh; }
+
+  /* ---- War screen ---- */
+  #tela-guerra{ gap:1.4vh; padding:1.6vh 2vw; }
+  .guerra-header{ text-align:center; }
+  .guerra-stats{ display:grid; grid-template-columns:repeat(4,1fr); gap:1vh; }
+  .guerra-stat{ background:var(--card); border:1px solid #5c1c1c; border-radius:1vh; padding:1vh; text-align:center; }
+  .guerra-stat .lbl{ font-size:1.5vh; color:var(--text-dim); }
+  .guerra-stat .val{ font-size:2.4vh; color:var(--gold); font-weight:700; }
+  .fase-badge{ display:inline-block; background:var(--red); color:white; padding:0.6vh 1.6vw; border-radius:2vh; font-size:1.8vh; font-weight:700; }
+  .guerra-opcoes{ display:grid; grid-template-columns:1fr 1fr; gap:1.2vh; flex:1; }
+  .guerra-opcao{ text-align:left; font-size:1.9vh; padding:1.8vh 1.6vw; background:linear-gradient(180deg,#2a1818,#1a1010); border-color:#5c1c1c; }
+  .guerra-opcao:hover{ border-color:var(--red); }
+  .guerra-log{ max-height:14vh; overflow-y:auto; background:var(--bg2); border-radius:1vh; padding:1vh; font-size:1.6vh; }
+
+  /* ---- End screen ---- */
+  #tela-final{ align-items:center; justify-content:center; gap:2.4vh; text-align:center; }
+  #final-titulo{ font-size:5vh; }
+  .final-stats{ display:grid; grid-template-columns:repeat(4,1fr); gap:1.2vh; max-width:80vw; }
+
+  ::-webkit-scrollbar{ width:0.8vh; height:0.8vh; }
+  ::-webkit-scrollbar-thumb{ background:#34405a; border-radius:1vh; }
+  ::-webkit-scrollbar-track{ background:transparent; }
+
+  @media (max-width:900px){
+    .indicadores-grid{ grid-template-columns:repeat(2,1fr); }
+    .evento-opcoes{ grid-template-columns:1fr; }
+    .guerra-opcoes{ grid-template-columns:1fr; }
+    .guerra-stats{ grid-template-columns:repeat(2,1fr); }
+    .historico-painel{ width:70vw; }
+  }
+</style>
 </head>
 <body>
-    <div id="game-container">
+<div id="app">
 
-        <!-- TELA DE CRIAÇÃO -->
-        <div id="creation-screen" class="screen active">
-            <h1>🌍 KARMA: GOVERNE SUA NAÇÃO</h1>
+  <!-- ===================== TELA DE CRIAÇÃO ===================== -->
+  <section id="tela-criacao" class="screen active">
+    <h1 style="text-align:center;">🏛️ KARMA: GOVERNANDO NAÇÕES</h1>
+    <div class="etapas-nav" id="etapas-nav"></div>
 
-            <!-- Nome -->
-            <div class="form-group">
-                <label>🏛️ Nome da Nação</label>
-                <div id="name-display">DIGITE O NOME</div>
-                <div class="virtual-keyboard" id="keyboard"></div>
-            </div>
-
-            <!-- Continente -->
-            <div class="form-group">
-                <label>🌎 Escolha o Continente</label>
-                <div class="btn-group">
-                    <button class="btn btn-secondary continent-btn" data-continent="América">América</button>
-                    <button class="btn btn-secondary continent-btn" data-continent="Europa">Europa</button>
-                    <button class="btn btn-secondary continent-btn" data-continent="África">África</button>
-                    <button class="btn btn-secondary continent-btn" data-continent="Ásia">Ásia</button>
-                    <button class="btn btn-secondary continent-btn" data-continent="Oceania">Oceania</button>
-                </div>
-                <p style="margin-top:0.5vh;font-size:2.2vh;color:#b0c4d8;">Selecionado: <span id="continent-display">Nenhum</span></p>
-            </div>
-
-            <!-- Governo -->
-            <div class="form-group">
-                <label>⚖️ Sistema de Governo</label>
-                <div class="btn-group">
-                    <button class="btn btn-secondary gov-btn" data-gov="presidencialismo">Presidencialismo</button>
-                    <button class="btn btn-secondary gov-btn" data-gov="parlamentarismo">Parlamentarismo</button>
-                    <button class="btn btn-secondary gov-btn" data-gov="semipresidencialismo">Semipresidencialismo</button>
-                </div>
-                <p style="margin-top:0.5vh;font-size:2.2vh;color:#b0c4d8;">Selecionado: <span id="gov-display">Nenhum</span></p>
-            </div>
-
-            <!-- Editor de Bandeira -->
-            <div class="form-group">
-                <label>🎨 Crie sua Bandeira (clique nas partes para colorir)</label>
-                <div class="flag-editor">
-                    <canvas id="flag-canvas" width="400" height="260"></canvas>
-                    <div class="flag-controls">
-                        <div class="color-picker" id="color-picker"></div>
-                        <div style="display:flex;gap:1vw;align-items:center;flex-wrap:wrap;justify-content:center;">
-                            <span style="font-size:2.2vh;color:#b0c4d8;">Símbolo:</span>
-                            <div class="symbol-picker" id="symbol-picker">
-                                <button class="sym-btn" data-symbol="none">✖</button>
-                                <button class="sym-btn" data-symbol="star">★</button>
-                                <button class="sym-btn" data-symbol="circle">●</button>
-                                <button class="sym-btn" data-symbol="diamond">◆</button>
-                                <button class="sym-btn" data-symbol="cross">✚</button>
-                            </div>
-                        </div>
-                        <div style="display:flex;gap:0.8vw;flex-wrap:wrap;justify-content:center;">
-                            <button class="btn btn-secondary" id="flag-preset-1" style="font-size:1.8vh;padding:0.6vh 1.2vw;">Listras H</button>
-                            <button class="btn btn-secondary" id="flag-preset-2" style="font-size:1.8vh;padding:0.6vh 1.2vw;">Listras V</button>
-                            <button class="btn btn-secondary" id="flag-preset-3" style="font-size:1.8vh;padding:0.6vh 1.2vw;">Cruz</button>
-                            <button class="btn btn-secondary" id="flag-preset-4" style="font-size:1.8vh;padding:0.6vh 1.2vw;">Diagonal</button>
-                        </div>
-                        <p style="font-size:1.8vh;color:#889aa8;margin-top:0.2vh;">Clique em uma faixa ou no fundo para mudar a cor</p>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Botão Iniciar -->
-            <div class="btn-group" style="margin-top:1vh;">
-                <button class="btn btn-primary btn-lg" id="start-game-btn">🚀 Iniciar Partida</button>
-            </div>
-        </div>
-
-        <!-- TELA DE RESUMO -->
-        <div id="summary-screen" class="screen">
-            <h1>🏁 NAÇÃO CRIADA</h1>
-            <div style="display:flex;flex-direction:column;align-items:center;gap:1.2vh;background:#1e2836;border-radius:16px;padding:2vh 2vw;border:1px solid #3a4a5e;">
-                <div class="flag-mini" style="width:12vw;height:8vw;border:3px solid #f0c27a;">
-                    <canvas id="summary-flag" width="200" height="140"></canvas>
-                </div>
-                <h2 id="summary-name" style="font-size:4vh;color:#f0c27a;">Nome</h2>
-                <p style="font-size:2.8vh;">🌎 <span id="summary-continent">Continente</span></p>
-                <p style="font-size:2.8vh;">⚖️ <span id="summary-gov">Governo</span></p>
-                <button class="btn btn-primary btn-lg" id="start-game-btn-2" style="margin-top:1vh;">⚔️ Começar a Governar</button>
-            </div>
-        </div>
-
-        <!-- TELA DE JOGO -->
-        <div id="game-screen" class="screen">
-            <div class="top-bar">
-                <div class="nation-info">
-                    <div class="flag-mini"><canvas id="game-flag" width="120" height="84"></canvas></div>
-                    <span class="nation-name" id="game-nation-name">Nome</span>
-                    <span style="font-size:2.2vh;color:#889aa8;margin-left:0.5vw;" id="game-continent-gov">Continente • Governo</span>
-                </div>
-                <div class="turn-info">Turno <span id="turn-counter">1</span></div>
-            </div>
-
-            <!-- Indicadores -->
-            <div id="indicators">
-                <div class="indicator">
-                    <span class="indicator-label">☯ Karma</span>
-                    <span class="indicator-value karma" id="karma-display">50</span>
-                    <div class="indicator-bar"><div class="indicator-bar-fill fill-karma" id="karma-bar" style="width:50%;"></div></div>
-                </div>
-                <div class="indicator">
-                    <span class="indicator-label">💰 Economia</span>
-                    <span class="indicator-value" id="economy-display">50</span>
-                    <div class="indicator-bar"><div class="indicator-bar-fill fill-economy" id="economy-bar" style="width:50%;"></div></div>
-                </div>
-                <div class="indicator">
-                    <span class="indicator-label">🤝 Respeito</span>
-                    <span class="indicator-value" id="respect-display">50</span>
-                    <div class="indicator-bar"><div class="indicator-bar-fill fill-respect" id="respect-bar" style="width:50%;"></div></div>
-                </div>
-                <div class="indicator">
-                    <span class="indicator-label">🏥 Qualidade de Vida</span>
-                    <span class="indicator-value" id="quality-display">50</span>
-                    <div class="indicator-bar"><div class="indicator-bar-fill fill-quality" id="quality-bar" style="width:50%;"></div></div>
-                </div>
-                <div class="indicator">
-                    <span class="indicator-label">⚖️ Estabilidade</span>
-                    <span class="indicator-value" id="stability-display">50</span>
-                    <div class="indicator-bar"><div class="indicator-bar-fill fill-stability" id="stability-bar" style="width:50%;"></div></div>
-                </div>
-                <div class="indicator">
-                    <span class="indicator-label">🌐 Relações Internacionais</span>
-                    <span class="indicator-value" id="relations-display">50</span>
-                    <div class="indicator-bar"><div class="indicator-bar-fill fill-relations" id="relations-bar" style="width:50%;"></div></div>
-                </div>
-            </div>
-
-            <!-- Evento -->
-            <div id="event-area" class="event-card fade-in">
-                <div class="event-title" id="event-title">Título do Evento</div>
-                <div class="event-desc" id="event-desc">Descrição do evento atual.</div>
-                <div class="options-grid" id="options-container"></div>
-                <div id="result-area" style="margin-top:1.5vh;"></div>
-                <div style="display:flex;justify-content:center;margin-top:1vh;">
-                    <button class="btn btn-primary" id="next-turn-btn" style="display:none;min-width:20vw;">▶ Próximo Turno</button>
-                </div>
-            </div>
-        </div>
-
-        <!-- TELA DE GUERRA -->
-        <div id="war-screen" class="screen">
-            <div class="war-panel">
-                <div class="war-title">⚔️ GUERRA DECLARADA!</div>
-                <div class="war-info" id="war-info-text">Conflito com [Nação]</div>
-                <div style="display:flex;flex-wrap:wrap;justify-content:center;gap:1.5vh 2vw;margin:2vh 0;">
-                    <div style="background:#1e2836;border-radius:12px;padding:1.2vh 1.5vw;text-align:center;min-width:15vw;">
-                        <div style="font-size:2.2vh;color:#889aa8;">Força Militar</div>
-                        <div style="font-size:3.6vh;font-weight:700;" id="war-military">0</div>
-                    </div>
-                    <div style="background:#1e2836;border-radius:12px;padding:1.2vh 1.5vw;text-align:center;min-width:15vw;">
-                        <div style="font-size:2.2vh;color:#889aa8;">Apoio de Aliados</div>
-                        <div style="font-size:3.6vh;font-weight:700;" id="war-allies">0</div>
-                    </div>
-                    <div style="background:#1e2836;border-radius:12px;padding:1.2vh 1.5vw;text-align:center;min-width:15vw;">
-                        <div style="font-size:2.2vh;color:#889aa8;">Força Inimiga</div>
-                        <div style="font-size:3.6vh;font-weight:700;" id="war-enemy">0</div>
-                    </div>
-                </div>
-                <div style="font-size:2.8vh;color:#d0dce8;text-align:center;margin:1vh 0;">Escolha sua estratégia:</div>
-                <div class="options-grid" id="war-options">
-                    <button class="btn btn-danger war-opt" data-opt="attack">⚡ Ataque Total</button>
-                    <button class="btn btn-info war-opt" data-opt="defense">🛡️ Defesa</button>
-                    <button class="btn btn-warning war-opt" data-opt="counter">🔱 Contra-ataque</button>
-                    <button class="btn btn-secondary war-opt" data-opt="negotiate">🤝 Negociação</button>
-                </div>
-                <div id="war-result" style="margin-top:2vh;text-align:center;font-size:2.8vh;"></div>
-            </div>
-        </div>
-
-        <!-- TELA FINAL -->
-        <div id="final-screen" class="screen">
-            <div style="display:flex;flex-direction:column;align-items:center;justify-content:center;flex:1;text-align:center;">
-                <div id="final-icon" style="font-size:12vh;">🏆</div>
-                <h1 id="final-title" style="font-size:6vh;">VITÓRIA!</h1>
-                <p id="final-message" style="font-size:3.2vh;max-width:60vw;margin:1.5vh auto;">Sua nação alcançou o Karma máximo!</p>
-                <button class="btn btn-primary btn-lg" id="restart-btn" style="margin-top:3vh;">🔄 Jogar Novamente</button>
-            </div>
-        </div>
-
+    <!-- Etapa 1: Nome -->
+    <div class="etapa-conteudo ativa" data-etapa="1">
+      <h2>Escolha o nome da sua nação</h2>
+      <div id="nome-display">_</div>
+      <div id="teclado"></div>
     </div>
-    <script>
-        // ============================================================
-        // JOGO COMPLETO - KARMA: GOVERNANDO NAÇÕES
-        // ============================================================
 
-        // ---------- ESTADO GLOBAL ----------
-        const G = {
-            fase: 'criacao', // criacao | resumo | jogo | guerra | final
-            nome: '',
-            continente: '',
-            governo: '',
-            bandeira: { cores: ['#1a3a5a', '#d4a050', '#1a3a5a'], simbolo: 'none', simboloCor: '#f0c27a' },
-            turno: 0,
-            // indicadores 0-100
-            karma: 50,
-            economia: 50,
-            respeito: 50,
-            qualidadeVida: 50,
-            estabilidade: 50,
-            relacoesInternacionais: 50,
-            // nações estrangeiras (relação 0-100)
-            nacoes: {
-                'Arcadia': { nome: 'Arcádia', relacao: 60, atitude: 'amigável', militar: 70 },
-                'Valdoria': { nome: 'Valdória', relacao: 50, atitude: 'neutra', militar: 60 },
-                'Nordica': { nome: 'Nórdica', relacao: 40, atitude: 'neutra', militar: 55 },
-                'Sulterra': { nome: 'Sulterra', relacao: 30, atitude: 'hostil', militar: 50 },
-                'Orientalis': { nome: 'Orientalis', relacao: 45, atitude: 'neutra', militar: 65 },
-            },
-            guerra: null, // { inimigo, turnoInicio, militarAliados, militarInimigo, resultado? }
-            eventosAnteriores: [],
-            flags: {}, // para consequências futuras
-            waitingNextTurn: false,
-        };
+    <!-- Etapa 2: Continente -->
+    <div class="etapa-conteudo" data-etapa="2">
+      <h2>Escolha o continente</h2>
+      <div class="opcoes-grandes" id="opcoes-continente"></div>
+      <p id="continente-selecionado" style="color:var(--gold);"></p>
+    </div>
 
-        // ---------- EVENTOS POR GOVERNO ----------
-        const EVENTOS = {
-            // Eventos comuns (para todos os governos)
-            comum: [
-                {
-                    titulo: '🌪️ Desastre Natural',
-                    desc: 'Um furacão devastador atingiu a costa leste. Há danos extensos e vítimas.',
-                    opcoes: [
-                        { texto: '💰 Enviar ajuda financeira e equipes de resgate', efeitos: { economia: -10, qualidadeVida: +10, estabilidade: +5, karma: +5 } },
-                        { texto: '🏗️ Mobilizar o exército para ajudar na reconstrução', efeitos: { economia: -5, respeito: +8, estabilidade: +8, karma: +3 } },
-                        { texto: '📉 Reduzir gastos públicos para cobrir os danos', efeitos: { economia: +5, qualidadeVida: -8, estabilidade: -5, karma: -3 } },
-                        { texto: '🙏 Pedir ajuda internacional', efeitos: { relacoesInternacionais: +10, economia: -2, respeito: +5, karma: +2 } },
-                    ]
-                },
-                {
-                    titulo: '📈 Crise Econômica Global',
-                    desc: 'Os mercados mundiais entraram em colapso. Sua economia está sob pressão.',
-                    opcoes: [
-                        { texto: '🏦 Cortar impostos para estimular o consumo', efeitos: { economia: +10, estabilidade: -5, respeito: +5, karma: +3 } },
-                        { texto: '🔧 Investir em infraestrutura e empregos', efeitos: { economia: +8, qualidadeVida: +5, estabilidade: +5, karma: +5 } },
-                        { texto: '📊 Aumentar tarifas de importação', efeitos: { economia: +5, relacoesInternacionais: -10, respeito: -3, karma: -2 } },
-                        { texto: '💳 Emitir títulos da dívida', efeitos: { economia: +3, estabilidade: -8, karma: -5 } },
-                    ]
-                },
-                {
-                    titulo: '🏥 Pandemia Global',
-                    desc: 'Uma nova doença se espalha rapidamente. O sistema de saúde está sobrecarregado.',
-                    opcoes: [
-                        { texto: '🧪 Financiar pesquisa e vacinas', efeitos: { economia: -12, qualidadeVida: +15, respeito: +8, karma: +8 } },
-                        { texto: '🚧 Impor lockdown e restrições', efeitos: { economia: -10, qualidadeVida: +5, estabilidade: -5, karma: +2 } },
-                        { texto: '💊 Distribuir medicamentos básicos', efeitos: { economia: -5, qualidadeVida: +8, respeito: +5, karma: +5 } },
-                        { texto: '🌍 Cooperar com a OMS', efeitos: { relacoesInternacionais: +10, economia: -3, qualidadeVida: +5, karma: +4 } },
-                    ]
-                },
-                {
-                    titulo: '📚 Reforma Educacional',
-                    desc: 'Os índices de educação estão caindo. É necessário agir.',
-                    opcoes: [
-                        { texto: '🏫 Aumentar investimento em escolas públicas', efeitos: { economia: -8, qualidadeVida: +12, respeito: +8, karma: +6 } },
-                        { texto: '💻 Implementar ensino digital', efeitos: { economia: -5, qualidadeVida: +8, respeito: +5, karma: +4 } },
-                        { texto: '📉 Cortar gastos com educação para outros setores', efeitos: { economia: +5, qualidadeVida: -10, respeito: -8, karma: -8 } },
-                        { texto: '🏆 Criar bolsas de estudo para alunos talentosos', efeitos: { economia: -3, qualidadeVida: +6, respeito: +6, karma: +5 } },
-                    ]
-                },
-                {
-                    titulo: '🌳 Protestos Ambientais',
-                    desc: 'Ativistas ambientais exigem ações contra o desmatamento e poluição.',
-                    opcoes: [
-                        { texto: '🌿 Criar reservas naturais e leis ambientais', efeitos: { economia: -8, qualidadeVida: +10, respeito: +10, karma: +8 } },
-                        { texto: '🏭 Apoiar indústrias verdes com subsídios', efeitos: { economia: -5, qualidadeVida: +8, respeito: +6, karma: +6 } },
-                        { texto: '🔨 Ignorar e priorizar o crescimento econômico', efeitos: { economia: +10, qualidadeVida: -10, respeito: -12, karma: -10 } },
-                        { texto: '🤝 Negociar com os ativistas', efeitos: { respeito: +5, estabilidade: +5, karma: +3 } },
-                    ]
-                },
-                {
-                    titulo: '⚡ Crise de Energia',
-                    desc: 'O país sofre com apagões e falta de combustível. A indústria para.',
-                    opcoes: [
-                        { texto: '🔋 Investir em energias renováveis', efeitos: { economia: -8, qualidadeVida: +8, estabilidade: +6, karma: +6 } },
-                        { texto: '⛏️ Explorar novas reservas de petróleo', efeitos: { economia: +10, qualidadeVida: -5, respeito: -5, karma: -3 } },
-                        { texto: '⚡ Racionamento de energia', efeitos: { economia: -5, estabilidade: -8, qualidadeVida: -5, karma: -5 } },
-                        { texto: '🤝 Importar energia de países vizinhos', efeitos: { relacoesInternacionais: +8, economia: -3, estabilidade: +5, karma: +3 } },
-                    ]
-                },
-                {
-                    titulo: '🕊️ Conflito de Fronteiras',
-                    desc: 'Uma nação vizinha reivindica uma área de sua fronteira. Tensões aumentam.',
-                    opcoes: [
-                        { texto: '⚔️ Mobilizar forças militares na fronteira', efeitos: { respeito: +5, estabilidade: -8, relacoesInternacionais: -15, karma: -5 } },
-                        { texto: '🤝 Abrir negociações diplomáticas', efeitos: { relacoesInternacionais: +10, respeito: +5, karma: +5 } },
-                        { texto: '📢 Apelar à comunidade internacional', efeitos: { relacoesInternacionais: +8, respeito: +5, karma: +3 } },
-                        { texto: '🏳️ Ceder o território para evitar conflito', efeitos: { respeito: -15, estabilidade: +5, relacoesInternacionais: +5, karma: -8 } },
-                    ]
-                },
-                {
-                    titulo: '📱 Revolução Digital',
-                    desc: 'A tecnologia avança rapidamente. O país precisa se adaptar.',
-                    opcoes: [
-                        { texto: '💻 Criar polos tecnológicos e incentivar startups', efeitos: { economia: +12, qualidadeVida: +5, respeito: +8, karma: +6 } },
-                        { texto: '📡 Expandir internet para áreas rurais', efeitos: { economia: +5, qualidadeVida: +10, respeito: +5, karma: +5 } },
-                        { texto: '🔒 Regular fortemente a internet', efeitos: { economia: -5, respeito: -8, estabilidade: +5, karma: -3 } },
-                        { texto: '📉 Ignorar, focar em setores tradicionais', efeitos: { economia: -5, qualidadeVida: -5, respeito: -5, karma: -5 } },
-                    ]
-                },
-                {
-                    titulo: '🏛️ Corrupção no Governo',
-                    desc: 'Escândalos de corrupção envolvendo altos funcionários vêm à tona.',
-                    opcoes: [
-                        { texto: '⚖️ Investigar e punir os responsáveis', efeitos: { respeito: +12, estabilidade: +8, economia: -5, karma: +10 } },
-                        { texto: '📰 Abafar o escândalo', efeitos: { estabilidade: -10, respeito: -15, karma: -12 } },
-                        { texto: '🔄 Reformar o sistema anticorrupção', efeitos: { economia: -5, respeito: +10, estabilidade: +10, karma: +8 } },
-                        { texto: '🤝 Negociar com os envolvidos', efeitos: { respeito: -8, estabilidade: -5, economia: +5, karma: -5 } },
-                    ]
-                },
-                {
-                    titulo: '🚗 Mobilidade Urbana',
-                    desc: 'As cidades estão congestionadas e o transporte público é precário.',
-                    opcoes: [
-                        { texto: '🚇 Investir em metrô e trens', efeitos: { economia: -10, qualidadeVida: +10, respeito: +5, karma: +6 } },
-                        { texto: '🚲 Criar ciclovias e zonas pedonais', efeitos: { economia: -5, qualidadeVida: +8, respeito: +5, karma: +5 } },
-                        { texto: '🚗 Expandir rodovias', efeitos: { economia: -5, qualidadeVida: -3, respeito: -3, karma: -2 } },
-                        { texto: '📉 Aumentar impostos sobre veículos', efeitos: { economia: +5, qualidadeVida: -5, respeito: -8, karma: -5 } },
-                    ]
-                },
-                {
-                    titulo: '🤖 Automação e Emprego',
-                    desc: 'A automação ameaça milhões de empregos. Como agir?',
-                    opcoes: [
-                        { texto: '📚 Programas de requalificação profissional', efeitos: { economia: -8, qualidadeVida: +10, respeito: +8, karma: +7 } },
-                        { texto: '🏭 Incentivar indústrias intensivas em mão de obra', efeitos: { economia: +5, qualidadeVida: +3, respeito: +5, karma: +3 } },
-                        { texto: '🤖 Abraçar a automação e cortar impostos', efeitos: { economia: +10, qualidadeVida: -5, respeito: -8, karma: -5 } },
-                        { texto: '📉 Ignorar o problema', efeitos: { economia: -5, qualidadeVida: -5, respeito: -5, karma: -5 } },
-                    ]
-                },
-            ],
-            // Eventos específicos do Presidencialismo
-            presidencialismo: [
-                {
-                    titulo: '🏛️ Conflito com o Congresso',
-                    desc: 'O Congresso rejeita seu projeto de lei principal. Você é o Presidente.',
-                    opcoes: [
-                        { texto: '🗣️ Fazer um discurso à nação para pressionar', efeitos: { respeito: +5, estabilidade: -5, karma: +2 } },
-                        { texto: '✍️ Editar uma medida provisória', efeitos: { respeito: -3, estabilidade: -8, karma: -5 } },
-                        { texto: '🤝 Negociar com líderes da oposição', efeitos: { respeito: +8, estabilidade: +8, karma: +6 } },
-                        { texto: '📉 Vetar tudo e dissolver o Congresso', efeitos: { respeito: -10, estabilidade: -15, karma: -10 } },
-                    ]
-                },
-                {
-                    titulo: '📊 Impeachment Iminente',
-                    desc: 'A oposição está reunindo apoio para um impeachment contra você.',
-                    opcoes: [
-                        { texto: '⚖️ Apresentar defesa robusta', efeitos: { respeito: +5, estabilidade: +5, karma: +3 } },
-                        { texto: '🗣️ Mobilizar a base aliada nas ruas', efeitos: { respeito: +8, estabilidade: -8, karma: +2 } },
-                        { texto: '🤝 Fazer acordos com partidos menores', efeitos: { respeito: +3, estabilidade: +5, karma: +4 } },
-                        { texto: '📉 Renunciar para evitar crise', efeitos: { respeito: -15, estabilidade: +5, karma: -10 } },
-                    ]
-                },
-                {
-                    titulo: '📢 Popularidade em Queda',
-                    desc: 'Sua aprovação está caindo. A população está insatisfeita.',
-                    opcoes: [
-                        { texto: '📺 Aumentar a presença na mídia e redes sociais', efeitos: { respeito: +8, estabilidade: -3, karma: +3 } },
-                        { texto: '🎁 Lançar programas sociais populares', efeitos: { economia: -8, qualidadeVida: +10, respeito: +10, karma: +8 } },
-                        { texto: '🔍 Investigar e punir corrupção', efeitos: { respeito: +10, estabilidade: +5, economia: -3, karma: +7 } },
-                        { texto: '📉 Ignorar e esperar melhorar', efeitos: { respeito: -10, estabilidade: -8, karma: -8 } },
-                    ]
-                },
-                {
-                    titulo: '🏗️ Plano de Infraestrutura',
-                    desc: 'O país precisa de grandes obras. Como Presidente, você decide.',
-                    opcoes: [
-                        { texto: '🏗️ Lançar um mega programa de obras', efeitos: { economia: -10, qualidadeVida: +12, respeito: +8, karma: +7 } },
-                        { texto: '🔨 PPP com iniciativa privada', efeitos: { economia: +5, qualidadeVida: +5, respeito: +3, karma: +3 } },
-                        { texto: '📉 Cortar gastos e adiar obras', efeitos: { economia: +5, qualidadeVida: -8, respeito: -8, karma: -8 } },
-                        { texto: '🌍 Buscar financiamento internacional', efeitos: { relacoesInternacionais: +8, economia: -3, qualidadeVida: +5, karma: +4 } },
-                    ]
-                },
-                {
-                    titulo: '⚡ Crise Política',
-                    desc: 'Ministros do seu governo são acusados de corrupção. O que fazer?',
-                    opcoes: [
-                        { texto: '🔥 Demitir todos os envolvidos', efeitos: { respeito: +10, estabilidade: +5, economia: -3, karma: +6 } },
-                        { texto: '🛡️ Proteger seus aliados', efeitos: { respeito: -12, estabilidade: -10, karma: -10 } },
-                        { texto: '⚖️ Criar comissão de inquérito', efeitos: { respeito: +5, estabilidade: +5, karma: +5 } },
-                        { texto: '📰 Vazar informações para a imprensa', efeitos: { respeito: +3, estabilidade: -5, karma: -2 } },
-                    ]
-                },
-            ],
-            // Eventos específicos do Parlamentarismo
-            parlamentarismo: [
-                {
-                    titulo: '🗳️ Moção de Confiança',
-                    desc: 'O Parlamento votará uma moção de confiança ao seu governo. Você é o Primeiro-Ministro.',
-                    opcoes: [
-                        { texto: '🗣️ Discurso forte para garantir votos', efeitos: { respeito: +8, estabilidade: +5, karma: +5 } },
-                        { texto: '🤝 Fazer concessões a partidos menores', efeitos: { respeito: +5, estabilidade: +8, karma: +6 } },
-                        { texto: '📉 Renunciar antes da votação', efeitos: { respeito: -10, estabilidade: -5, karma: -10 } },
-                        { texto: '🔥 Dissolver o Parlamento e convocar eleições', efeitos: { respeito: +3, estabilidade: -10, karma: -5 } },
-                    ]
-                },
-                {
-                    titulo: '🔄 Coalizão em Crise',
-                    desc: 'Seu partido aliado ameaça deixar a coalizão. O governo pode cair.',
-                    opcoes: [
-                        { texto: '🤝 Oferecer ministérios e cargos', efeitos: { respeito: +3, estabilidade: +8, economia: -5, karma: +3 } },
-                        { texto: '📜 Propor legislação que agrade o aliado', efeitos: { respeito: +5, estabilidade: +5, karma: +5 } },
-                        { texto: '🔨 Substituir o aliado por outro partido', efeitos: { respeito: -8, estabilidade: -5, karma: -5 } },
-                        { texto: '📉 Deixar a coalizão colapsar e governar com minoria', efeitos: { respeito: -10, estabilidade: -12, karma: -10 } },
-                    ]
-                },
-                {
-                    titulo: '📊 Orçamento Rejeitado',
-                    desc: 'O Parlamento rejeitou seu projeto de orçamento. O país fica sem verba.',
-                    opcoes: [
-                        { texto: '🤝 Negociar com a oposição para aprovar', efeitos: { respeito: +5, estabilidade: +5, economia: +3, karma: +4 } },
-                        { texto: '📉 Usar orçamento provisório e cortar gastos', efeitos: { economia: -5, qualidadeVida: -8, respeito: -5, karma: -5 } },
-                        { texto: '🔥 Convocar eleições antecipadas', efeitos: { respeito: -5, estabilidade: -10, karma: -5 } },
-                        { texto: '📢 Apelar à opinião pública', efeitos: { respeito: +8, estabilidade: +3, karma: +5 } },
-                    ]
-                },
-                {
-                    titulo: '🏛️ Reforma Política',
-                    desc: 'Há propostas para mudar o sistema eleitoral. Como Primeiro-Ministro, você decide.',
-                    opcoes: [
-                        { texto: '👍 Apoiar a reforma para fortalecer a democracia', efeitos: { respeito: +10, estabilidade: +5, karma: +8 } },
-                        { texto: '👎 Bloquear a reforma para manter poder', efeitos: { respeito: -8, estabilidade: -5, karma: -5 } },
-                        { texto: '📊 Propor uma reforma moderada', efeitos: { respeito: +5, estabilidade: +5, karma: +5 } },
-                        { texto: '📉 Ignorar o assunto', efeitos: { respeito: -5, estabilidade: -5, karma: -5 } },
-                    ]
-                },
-                {
-                    titulo: '⚖️ Voto de Desconfiança',
-                    desc: 'A oposição apresentou um voto de desconfiança. O governo está em risco.',
-                    opcoes: [
-                        { texto: '🗣️ Defender o governo com veemência', efeitos: { respeito: +8, estabilidade: +5, karma: +5 } },
-                        { texto: '🤝 Fazer acordos de última hora', efeitos: { respeito: +3, estabilidade: +8, karma: +4 } },
-                        { texto: '📉 Renunciar e formar novo governo', efeitos: { respeito: -10, estabilidade: -5, karma: -10 } },
-                        { texto: '🔥 Dissolver o Parlamento', efeitos: { respeito: -5, estabilidade: -12, karma: -8 } },
-                    ]
-                },
-            ],
-            // Eventos específicos do Semipresidencialismo
-            semipresidencialismo: [
-                {
-                    titulo: '⚡ Coabitação Conflituosa',
-                    desc: 'O Presidente e a maioria parlamentar são de partidos opostos. Tensão máxima.',
-                    opcoes: [
-                        { texto: '🤝 Buscar um pacto de governabilidade', efeitos: { respeito: +8, estabilidade: +10, karma: +8 } },
-                        { texto: '📜 Presidente usa decreto para contornar', efeitos: { respeito: -5, estabilidade: -8, karma: -5 } },
-                        { texto: '🏛️ PM tenta articular uma nova coalizão', efeitos: { respeito: +5, estabilidade: +5, karma: +5 } },
-                        { texto: '🔥 Conflito aberto entre os poderes', efeitos: { respeito: -10, estabilidade: -15, karma: -12 } },
-                    ]
-                },
-                {
-                    titulo: '📊 Disputa Orçamentária',
-                    desc: 'Presidente e Primeiro-Ministro divergem sobre o orçamento. Quem decide?',
-                    opcoes: [
-                        { texto: '🤝 Compartilhar responsabilidades e ceder', efeitos: { respeito: +5, estabilidade: +8, economia: +3, karma: +5 } },
-                        { texto: '📜 Presidente impõe seu plano', efeitos: { respeito: -5, estabilidade: -5, economia: +5, karma: -3 } },
-                        { texto: '🏛️ PM usa maioria para aprovar seu orçamento', efeitos: { respeito: -3, estabilidade: -5, economia: +5, karma: -2 } },
-                        { texto: '📊 Criar comissão mista para decidir', efeitos: { respeito: +8, estabilidade: +8, karma: +7 } },
-                    ]
-                },
-                {
-                    titulo: '🏛️ Crise de Competência',
-                    desc: 'Presidente e PM disputam quem tem poder sobre a política externa.',
-                    opcoes: [
-                        { texto: '🤝 Definir claramente as competências', efeitos: { respeito: +8, estabilidade: +10, relacoesInternacionais: +5, karma: +8 } },
-                        { texto: '📜 Presidente assume totalmente', efeitos: { respeito: -5, estabilidade: -5, relacoesInternacionais: +5, karma: -3 } },
-                        { texto: '🏛️ PM assume com apoio do Parlamento', efeitos: { respeito: -3, estabilidade: -5, relacoesInternacionais: +5, karma: -2 } },
-                        { texto: '🔥 Escalada e paralisia', efeitos: { respeito: -10, estabilidade: -12, relacoesInternacionais: -8, karma: -10 } },
-                    ]
-                },
-                {
-                    titulo: '⚖️ Reforma Constitucional',
-                    desc: 'Proposta para reformar a Constituição e redefinir poderes.',
-                    opcoes: [
-                        { texto: '👍 Apoiar a reforma para fortalecer o sistema', efeitos: { respeito: +10, estabilidade: +8, karma: +8 } },
-                        { texto: '👎 Bloquear para manter status quo', efeitos: { respeito: -5, estabilidade: -5, karma: -5 } },
-                        { texto: '📊 Propor uma reforma equilibrada', efeitos: { respeito: +5, estabilidade: +5, karma: +5 } },
-                        { texto: '📉 Ignorar a proposta', efeitos: { respeito: -5, estabilidade: -5, karma: -5 } },
-                    ]
-                },
-                {
-                    titulo: '🗳️ Eleições Legislativas',
-                    desc: 'Eleições para o Parlamento podem alterar a correlação de forças.',
-                    opcoes: [
-                        { texto: '📢 Campanha ativa do PM para manter maioria', efeitos: { respeito: +8, estabilidade: +5, karma: +5 } },
-                        { texto: '🤝 Presidente apoia candidatos aliados', efeitos: { respeito: +3, estabilidade: +3, karma: +3 } },
-                        { texto: '📉 Neutralidade e aceitar o resultado', efeitos: { respeito: +5, estabilidade: +5, karma: +5 } },
-                        { texto: '🔥 Tentar influenciar o resultado', efeitos: { respeito: -10, estabilidade: -8, karma: -8 } },
-                    ]
-                },
-            ],
-        };
+    <!-- Etapa 3: Governo -->
+    <div class="etapa-conteudo" data-etapa="3">
+      <h2>Escolha o sistema de governo</h2>
+      <div class="opcoes-grandes" id="opcoes-governo"></div>
+      <p id="governo-selecionado" style="color:var(--gold);"></p>
+    </div>
 
-        // ---------- NAÇÕES ESTRANGEIRAS PARA EVENTOS DIPLOMÁTICOS ----------
-        function getNacaoAleatoria() {
-            const keys = Object.keys(G.nacoes);
-            return keys[Math.floor(Math.random() * keys.length)];
-        }
+    <!-- Etapa 4: Bandeira -->
+    <div class="etapa-conteudo" data-etapa="4">
+      <h2>Crie a bandeira da sua nação</h2>
+      <canvas id="canvas-bandeira" width="400" height="260"></canvas>
+      <div class="row center">
+        <div class="paleta" id="paleta-cores"></div>
+      </div>
+      <div class="row center" id="simbolos-container"></div>
+      <div class="row center" id="presets-container"></div>
+    </div>
 
-        function getNacaoHostil() {
-            const keys = Object.keys(G.nacoes).filter(k => G.nacoes[k].atitude === 'hostil');
-            if (keys.length === 0) return getNacaoAleatoria();
-            return keys[Math.floor(Math.random() * keys.length)];
-        }
+    <div class="row" style="justify-content:space-between; margin-top:1.4vh;">
+      <button class="btn" id="btn-voltar-etapa">◀ Voltar</button>
+      <button class="btn primary big" id="btn-avancar-etapa">Avançar ▶</button>
+    </div>
+  </section>
 
-        // ---------- FUNÇÕES DE EVENTOS COM RELAÇÕES INTERNACIONAIS ----------
-        function gerarEventoDiplomatico() {
-            const n = getNacaoAleatoria();
-            const rel = G.nacoes[n].relacao;
-            let titulo, desc, opts;
-            if (rel < 30) {
-                titulo = `⚠️ Tensões com ${G.nacoes[n].nome}`;
-                desc = `As relações com ${G.nacoes[n].nome} estão ruins. Eles estão ameaçando sanções.`;
-                opts = [
-                    { texto: '🤝 Oferecer acordo comercial', efeitos: { relacoesInternacionais: +10, economia: +5, karma: +5 } },
-                    { texto: '⚔️ Posicionar forças na fronteira', efeitos: { relacoesInternacionais: -15, respeito: +5, estabilidade: -8, karma: -5 } },
-                    { texto: '📢 Apelar à ONU', efeitos: { relacoesInternacionais: +8, respeito: +5, karma: +3 } },
-                    { texto: '💰 Oferecer ajuda humanitária', efeitos: { relacoesInternacionais: +12, economia: -5, karma: +6 } },
-                ];
-            } else if (rel < 50) {
-                titulo = `🤝 Relações Neutras com ${G.nacoes[n].nome}`;
-                desc = `As relações com ${G.nacoes[n].nome} são neutras. Há oportunidades de cooperação.`;
-                opts = [
-                    { texto: '🤝 Firmar tratado de amizade', efeitos: { relacoesInternacionais: +10, respeito: +5, karma: +5 } },
-                    { texto: '📈 Aumentar comércio bilateral', efeitos: { relacoesInternacionais: +8, economia: +8, karma: +4 } },
-                    { texto: '⛔ Impor tarifas para proteger indústria local', efeitos: { relacoesInternacionais: -8, economia: +5, karma: -3 } },
-                    { texto: '🕊️ Propor aliança militar', efeitos: { relacoesInternacionais: +12, estabilidade: +5, respeito: +5, karma: +6 } },
-                ];
-            } else {
-                titulo = `🌟 Aliança com ${G.nacoes[n].nome}`;
-                desc = `${G.nacoes[n].nome} é um grande aliado. Como fortalecer essa relação?`;
-                opts = [
-                    { texto: '🤝 Aprofundar cooperação econômica', efeitos: { relacoesInternacionais: +5, economia: +10, karma: +5 } },
-                    { texto: '🛡️ Oferecer apoio militar', efeitos: { relacoesInternacionais: +8, respeito: +8, estabilidade: +5, karma: +6 } },
-                    { texto: '📉 Reduzir laços para não depender', efeitos: { relacoesInternacionais: -10, economia: -5, karma: -5 } },
-                    { texto: '🌍 Projetos conjuntos de infraestrutura', efeitos: { relacoesInternacionais: +6, economia: +8, qualidadeVida: +5, karma: +5 } },
-                ];
-            }
-            return { titulo, desc, opcoes };
-        }
+  <!-- ===================== TELA DE RESUMO ===================== -->
+  <section id="tela-resumo" class="screen">
+    <h1>Resumo da sua Nação</h1>
+    <canvas id="canvas-resumo-bandeira" width="360" height="234" class="bandeira-mini"></canvas>
+    <h2 id="resumo-nome"></h2>
+    <p id="resumo-info" style="color:var(--text-dim); font-size:2.4vh;"></p>
+    <div class="badges">
+      <div class="badge"><div>☯ Karma</div><div class="valor">50</div></div>
+      <div class="badge"><div>💰 Economia</div><div class="valor">50</div></div>
+      <div class="badge"><div>⚔️ Força Militar</div><div class="valor">30</div></div>
+    </div>
+    <button class="btn primary big" id="btn-comecar-governar">Começar a Governar ▶</button>
+  </section>
 
-        // ---------- GERADOR DE EVENTO DO TURNO ----------
-        function gerarEvento() {
-            // Se houver evento diplomático especial (30% de chance)
-            if (Math.random() < 0.25) {
-                return gerarEventoDiplomatico();
-            }
+  <!-- ===================== TELA PRINCIPAL DO JOGO ===================== -->
+  <section id="tela-jogo" class="screen">
+    <div class="topbar">
+      <div class="topbar-left">
+        <canvas id="canvas-topo-bandeira" width="64" height="42" class="bandeira-mini"></canvas>
+        <div>
+          <div class="topbar-nome" id="topo-nome"></div>
+          <div class="topbar-sub" id="topo-info"></div>
+        </div>
+      </div>
+      <div class="topbar-turno">Turno <span id="topo-turno">1</span></div>
+    </div>
 
-            // Escolher base de eventos conforme governo
-            let pool = [...EVENTOS.comum];
-            if (G.governo === 'presidencialismo') pool = pool.concat(EVENTOS.presidencialismo);
-            else if (G.governo === 'parlamentarismo') pool = pool.concat(EVENTOS.parlamentarismo);
-            else if (G.governo === 'semipresidencialismo') pool = pool.concat(EVENTOS.semipresidencialismo);
+    <div class="indicadores-grid" id="indicadores-grid"></div>
 
-            // Remover eventos que já aconteceram (evitar repetição muito cedo)
-            const jaVistos = G.eventosAnteriores.slice(-8);
-            pool = pool.filter(e => !jaVistos.includes(e.titulo));
+    <div class="card evento-card">
+      <div class="evento-titulo">
+        <span class="evento-emoji" id="evento-emoji">📋</span>
+        <h3 id="evento-titulo-txt">Carregando...</h3>
+      </div>
+      <p class="evento-desc" id="evento-desc"></p>
+      <div class="evento-opcoes" id="evento-opcoes"></div>
+      <div class="resultado-box hidden" id="resultado-box"></div>
+    </div>
 
-            if (pool.length === 0) pool = [...EVENTOS.comum];
+    <div class="footer-jogo">
+      <button class="btn" id="btn-historico">📜 Histórico</button>
+      <button class="btn primary big hidden" id="btn-proximo-turno">Próximo Turno ▶</button>
+    </div>
 
-            const evento = pool[Math.floor(Math.random() * pool.length)];
-            G.eventosAnteriores.push(evento.titulo);
-            if (G.eventosAnteriores.length > 30) G.eventosAnteriores.shift();
+    <div class="historico-painel hidden" id="historico-painel">
+      <h3>📜 Últimas Decisões</h3>
+      <div id="historico-lista"></div>
+      <button class="btn small" id="btn-fechar-historico" style="margin-top:1vh;">Fechar</button>
+    </div>
+  </section>
 
-            // Clonar para não modificar original
-            return {
-                titulo: evento.titulo,
-                desc: evento.desc,
-                opcoes: evento.opcoes.map(o => ({ ...o }))
-            };
-        }
+  <!-- ===================== TELA DE GUERRA ===================== -->
+  <section id="tela-guerra" class="screen">
+    <div class="guerra-header">
+      <h1 style="color:var(--red);">⚔️ ESTADO DE GUERRA</h1>
+      <p id="guerra-inimigo" style="font-size:2.4vh;"></p>
+      <span class="fase-badge" id="guerra-fase-badge">Fase 1</span>
+    </div>
+    <div class="guerra-stats" id="guerra-stats"></div>
+    <div class="card grow">
+      <h3 id="guerra-fase-titulo"></h3>
+      <p id="guerra-fase-desc" style="margin:1vh 0;"></p>
+      <div class="guerra-opcoes" id="guerra-opcoes"></div>
+      <div class="resultado-box hidden" id="guerra-resultado"></div>
+    </div>
+    <div class="guerra-log" id="guerra-log"></div>
+    <div style="text-align:right;">
+      <button class="btn primary big hidden" id="btn-guerra-continuar">Continuar ▶</button>
+    </div>
+  </section>
 
-        // ---------- APLICAR EFEITOS ----------
-        function aplicarEfeitos(efeitos) {
-            const clamp = (v) => Math.min(100, Math.max(0, v));
-            let deltaKarma = 0;
-            if (efeitos.karma) deltaKarma += efeitos.karma;
-            if (efeitos.economia) G.economia = clamp(G.economia + efeitos.economia);
-            if (efeitos.respeito) G.respeito = clamp(G.respeito + efeitos.respeito);
-            if (efeitos.qualidadeVida) G.qualidadeVida = clamp(G.qualidadeVida + efeitos.qualidadeVida);
-            if (efeitos.estabilidade) G.estabilidade = clamp(G.estabilidade + efeitos.estabilidade);
-            if (efeitos.relacoesInternacionais) G.relacoesInternacionais = clamp(G.relacoesInternacionais + efeitos.relacoesInternacionais);
-            if (deltaKarma !== 0) {
-                G.karma = clamp(G.karma + deltaKarma);
-            }
-            // Atualizar relações com nações estrangeiras (se houver efeitos específicos)
-            // Nota: efeitos podem incluir 'relacaoNacao' para uma nação específica
-            if (efeitos.relacaoNacao && efeitos.nacaoNome) {
-                const n = G.nacoes[efeitos.nacaoNome];
-                if (n) {
-                    n.relacao = clamp(n.relacao + efeitos.relacaoNacao);
-                    // Atualizar atitude
-                    if (n.relacao > 60) n.atitude = 'amigável';
-                    else if (n.relacao > 35) n.atitude = 'neutra';
-                    else n.atitude = 'hostil';
-                }
-            }
-            // Efeito em todas as nações (ex: sanções)
-            if (efeitos.relacaoTodas) {
-                for (let k in G.nacoes) {
-                    G.nacoes[k].relacao = clamp(G.nacoes[k].relacao + efeitos.relacaoTodas);
-                    if (G.nacoes[k].relacao > 60) G.nacoes[k].atitude = 'amigável';
-                    else if (G.nacoes[k].relacao > 35) G.nacoes[k].atitude = 'neutra';
-                    else G.nacoes[k].atitude = 'hostil';
-                }
-            }
-            atualizarIndicadores();
-        }
+  <!-- ===================== TELA FINAL ===================== -->
+  <section id="tela-final" class="screen">
+    <h1 id="final-titulo"></h1>
+    <canvas id="canvas-final-bandeira" width="360" height="234" class="bandeira-mini"></canvas>
+    <p id="final-msg" style="font-size:2.4vh; max-width:60vw;"></p>
+    <div class="final-stats" id="final-stats"></div>
+    <button class="btn primary big" id="btn-jogar-novamente">🔄 Jogar Novamente</button>
+  </section>
 
-        // ---------- ATUALIZAR UI INDICADORES ----------
-        function atualizarIndicadores() {
-            const clamp = (v) => Math.min(100, Math.max(0, v));
-            document.getElementById('karma-display').textContent = G.karma;
-            document.getElementById('karma-bar').style.width = G.karma + '%';
-            document.getElementById('economy-display').textContent = G.economia;
-            document.getElementById('economy-bar').style.width = G.economia + '%';
-            document.getElementById('respect-display').textContent = G.respeito;
-            document.getElementById('respect-bar').style.width = G.respeito + '%';
-            document.getElementById('quality-display').textContent = G.qualidadeVida;
-            document.getElementById('quality-bar').style.width = G.qualidadeVida + '%';
-            document.getElementById('stability-display').textContent = G.estabilidade;
-            document.getElementById('stability-bar').style.width = G.estabilidade + '%';
-            document.getElementById('relations-display').textContent = G.relacoesInternacionais;
-            document.getElementById('relations-bar').style.width = G.relacoesInternacionais + '%';
-            document.getElementById('turn-counter').textContent = G.turno;
-        }
+</div>
+<script>
+/* =========================================================================
+   KARMA: GOVERNANDO NAÇÕES — DADOS DO JOGO (parte 1)
+   Indicadores, nações estrangeiras e eventos universais.
+   ========================================================================= */
 
-        // ---------- MOSTRAR TELA ----------
-        function mostrarTela(id) {
-            document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
-            document.getElementById(id).classList.add('active');
-        }
+// ---- Metadados dos indicadores (chaves curtas usadas nos efeitos) ----
+const IND_META = {
+  k:  { nome:'Karma',                    emoji:'☯️', cor:'#e8c87a' },
+  ec: { nome:'Economia',                 emoji:'💰', cor:'#4caf50' },
+  r:  { nome:'Respeito',                 emoji:'🤝', cor:'#e8c435' },
+  q:  { nome:'Qualidade de Vida',        emoji:'🏥', cor:'#4a90d9' },
+  es: { nome:'Estabilidade',             emoji:'⚖️', cor:'#9b59b6' },
+  ri: { nome:'Relações Internacionais',  emoji:'🌐', cor:'#00bcd4' },
+  fm: { nome:'Força Militar',            emoji:'⚔️', cor:'#e74c3c' },
+  ed: { nome:'Educação',                 emoji:'📚', cor:'#5dade2' },
+};
+const IND_ORDEM = ['k','ec','r','q','es','ri','fm','ed'];
+const IND_INICIAL = { k:50, ec:50, r:50, q:50, es:50, ri:50, fm:30, ed:50 };
 
-        // ---------- INICIAR JOGO ----------
-        function iniciarJogo() {
-            if (!G.nome || !G.continente || !G.governo) {
-                alert('Preencha todos os campos: nome, continente e governo!');
-                return;
-            }
-            // Resumo
-            document.getElementById('summary-name').textContent = G.nome;
-            document.getElementById('summary-continent').textContent = G.continente;
-            document.getElementById('summary-gov').textContent = G.governo.charAt(0).toUpperCase() + G.governo.slice(1);
-            // Desenhar bandeira no resumo
-            desenharBandeira(document.getElementById('summary-flag'), G.bandeira);
-            mostrarTela('summary-screen');
-        }
+// ---- Nações estrangeiras pré-definidas ----
+const NACOES_BASE = [
+  { nome:'Arcádia',    atitude:'amigavel', militar:70, economia:65, relacao:65 },
+  { nome:'Valdória',   atitude:'neutra',   militar:60, economia:55, relacao:50 },
+  { nome:'Nórdica',    atitude:'neutra',   militar:55, economia:50, relacao:50 },
+  { nome:'Sulterra',   atitude:'hostil',   militar:50, economia:40, relacao:25 },
+  { nome:'Orientalis', atitude:'neutra',   militar:65, economia:60, relacao:50 },
+  { nome:'Merdina',    atitude:'amigavel', militar:45, economia:50, relacao:65 },
+  { nome:'Federácia',  atitude:'neutra',   militar:70, economia:60, relacao:50 },
+];
 
-        function comecarPartida() {
-            G.turno = 0;
-            G.karma = 50;
-            G.economia = 50;
-            G.respeito = 50;
-            G.qualidadeVida = 50;
-            G.estabilidade = 50;
-            G.relacoesInternacionais = 50;
-            G.eventosAnteriores = [];
-            G.flags = {};
-            G.guerra = null;
-            G.waitingNextTurn = false;
-            // Resetar relações
-            for (let k in G.nacoes) {
-                G.nacoes[k].relacao = 50 + Math.floor(Math.random() * 20) - 10;
-                if (G.nacoes[k].relacao > 60) G.nacoes[k].atitude = 'amigável';
-                else if (G.nacoes[k].relacao > 35) G.nacoes[k].atitude = 'neutra';
-                else G.nacoes[k].atitude = 'hostil';
-            }
-            // Atualizar UI do jogo
-            document.getElementById('game-nation-name').textContent = G.nome;
-            document.getElementById('game-continent-gov').textContent = `${G.continente} • ${G.governo.charAt(0).toUpperCase() + G.governo.slice(1)}`;
-            desenharBandeira(document.getElementById('game-flag'), G.bandeira);
-            atualizarIndicadores();
-            mostrarTela('game-screen');
-            proximoTurno();
-        }
+// ---- 30 Situações universais ----
+const EVENTOS_UNIVERSAIS = [
+{ id:'u01', tt:'Furacão Devastador', em:'🌀', d:'Um furacão de categoria 5 atinge a costa da nação, destruindo cidades inteiras e deixando milhares desabrigados.',
+  o:[
+    { t:'Evacuação em massa imediata, priorizando vidas', e:{k:6,q:8,ec:-10,es:-2} },
+    { t:'Focar toda a verba na reconstrução de infraestrutura', e:{ec:-15,q:10,es:5} },
+    { t:'Pedir ajuda humanitária internacional', e:{ri:8,k:3,ec:5,es:-2} },
+    { t:'Resposta mínima, poupar recursos do governo', e:{k:-10,q:-8,es:-5,ec:5} },
+  ]},
+{ id:'u02', tt:'Tsunami na Costa', em:'🌊', d:'Um tsunami atinge o litoral após um terremoto submarino, ameaçando portos e comunidades pesqueiras.',
+  o:[
+    { t:'Sistema de alerta antecipado salva vidas', e:{k:7,q:5,ec:-5} },
+    { t:'Reconstruir portos com tecnologia resistente', e:{ec:-12,q:6,es:4,ed:2} },
+    { t:'Realocar populações para o interior', e:{q:8,es:-6,k:2} },
+    { t:'Ignorar alertas anteriores, resposta lenta', e:{k:-12,q:-10,r:-5} },
+  ]},
+{ id:'u03', tt:'Incêndios Florestais', em:'🔥', d:'Incêndios florestais descontrolados consomem milhares de hectares e ameaçam áreas povoadas.',
+  o:[
+    { t:'Mobilizar brigadas e aeronaves de combate ao fogo', e:{ec:-8,q:6,k:4} },
+    { t:'Pedir apoio de nações vizinhas', e:{ri:6,ec:-3,k:2} },
+    { t:'Investir em prevenção futura (aceitar perdas agora)', e:{q:-6,ed:5,es:3} },
+    { t:'Culpar mudanças climáticas e não agir', e:{k:-10,q:-8,r:-6} },
+  ]},
+{ id:'u04', tt:'Erupção Vulcânica', em:'🌋', d:'Um vulcão entra em erupção, cobrindo regiões inteiras de cinzas e forçando evacuações.',
+  o:[
+    { t:'Evacuação organizada com apoio militar', e:{fm:3,q:7,k:5,ec:-6} },
+    { t:'Construir abrigos permanentes na região', e:{ec:-10,q:8,es:5} },
+    { t:'Aproveitar solo fértil pós-erupção para agricultura', e:{ec:8,ed:3,q:-3} },
+    { t:'Resposta caótica e desorganizada', e:{k:-8,q:-6,es:-6} },
+  ]},
+{ id:'u05', tt:'Deslizamento de Terra', em:'⛰️', d:'Fortes chuvas provocam deslizamentos que destroem bairros inteiros construídos em encostas.',
+  o:[
+    { t:'Remover famílias de áreas de risco preventivamente', e:{q:6,k:4,es:-4} },
+    { t:'Investir em contenção de encostas', e:{ec:-9,q:5,es:4} },
+    { t:'Indenizar vítimas e reconstruir', e:{ec:-12,k:6,r:3} },
+    { t:'Adiar decisões, aguardar orçamento futuro', e:{k:-9,q:-7,es:-3} },
+  ]},
+{ id:'u06', tt:'Colapso Financeiro', em:'📉', d:'Os mercados financeiros entram em colapso repentino, ameaçando bancos e poupanças da população.',
+  o:[
+    { t:'Resgatar bancos com dinheiro público', e:{ec:8,es:5,k:-4,r:-3} },
+    { t:'Deixar o mercado se autorregular', e:{ec:-14,es:-8,r:4} },
+    { t:'Criar fundo de proteção aos pequenos poupadores', e:{ec:-4,q:6,k:6} },
+    { t:'Impor controles rígidos de capital', e:{es:6,ri:-6,ec:-3} },
+  ]},
+{ id:'u07', tt:'Crise da Dívida Pública', em:'💸', d:'A dívida pública atinge níveis insustentáveis, pressionando credores internacionais.',
+  o:[
+    { t:'Negociar reestruturação com credores', e:{ri:5,ec:4,es:2} },
+    { t:'Cortar gastos sociais drasticamente', e:{ec:10,q:-10,k:-6} },
+    { t:'Aumentar impostos sobre grandes fortunas', e:{ec:6,r:5,es:-4} },
+    { t:'Ignorar o problema e emitir mais dívida', e:{ec:-10,es:-8,k:-5} },
+  ]},
+{ id:'u08', tt:'Bolha Imobiliária Estoura', em:'🏘️', d:'O mercado imobiliário superaquecido entra em colapso, deixando milhares com financiamentos impagáveis.',
+  o:[
+    { t:'Renegociar dívidas habitacionais das famílias', e:{q:7,ec:-6,k:5} },
+    { t:'Deixar o mercado corrigir naturalmente', e:{ec:-8,es:-6,r:2} },
+    { t:'Regular o setor com novas leis', e:{es:6,ec:-3,ed:2} },
+    { t:'Socorrer construtoras e bancos', e:{ec:5,k:-6,r:-4} },
+  ]},
+{ id:'u09', tt:'Desindustrialização Acelerada', em:'🏭', d:'Fábricas fecham em massa, transferindo produção para o exterior e gerando desemprego.',
+  o:[
+    { t:'Subsidiar a indústria nacional', e:{ec:-6,es:5,k:3} },
+    { t:'Investir em requalificação profissional', e:{ed:8,ec:-4,q:4} },
+    { t:'Aceitar a transição para serviços', e:{ec:3,es:-5,q:-3} },
+    { t:'Impor barreiras comerciais protecionistas', e:{ec:5,ri:-8,es:2} },
+  ]},
+{ id:'u10', tt:'Pandemia Global', em:'🦠', d:'Uma nova doença se espalha rapidamente pelo mundo, sobrecarregando hospitais e a economia.',
+  o:[
+    { t:'Lockdown rigoroso e apoio financeiro à população', e:{q:8,k:6,ec:-12,es:-3} },
+    { t:'Medidas moderadas, equilibrar saúde e economia', e:{q:3,ec:-4,es:2} },
+    { t:'Priorizar a economia, medidas mínimas', e:{ec:6,q:-10,k:-8} },
+    { t:'Investir pesado em vacinas e ciência', e:{ed:6,q:6,ec:-8,k:5} },
+  ]},
+{ id:'u11', tt:'Colapso do Sistema de Saúde', em:'🏥', d:'Hospitais públicos entram em colapso por falta de leitos, equipamentos e profissionais.',
+  o:[
+    { t:'Investimento emergencial em saúde pública', e:{q:10,ec:-10,k:5} },
+    { t:'Parceria com hospitais privados', e:{q:6,ec:-5,es:2} },
+    { t:'Reduzir cobertura para economizar', e:{q:-10,k:-9,ec:6} },
+    { t:'Campanha de prevenção e triagem eficiente', e:{q:5,ed:3,ec:-2} },
+  ]},
+{ id:'u12', tt:'Reforma Educacional Necessária', em:'🎓', d:'Especialistas alertam que o sistema educacional está defasado e precisa de reformas urgentes.',
+  o:[
+    { t:'Reforma completa com grande investimento', e:{ed:12,ec:-9,k:5} },
+    { t:'Reforma gradual e cautelosa', e:{ed:6,es:3} },
+    { t:'Focar em tecnologia nas escolas', e:{ed:8,ec:-5,q:3} },
+    { t:'Adiar a reforma por falta de orçamento', e:{ed:-6,k:-4,es:2} },
+  ]},
+{ id:'u13', tt:'Avanço Científico Revolucionário', em:'🔬', d:'Cientistas nacionais anunciam uma descoberta que pode revolucionar a economia e a saúde do país.',
+  o:[
+    { t:'Investir pesado para liderar o mercado global', e:{ec:10,ed:8,ri:4} },
+    { t:'Compartilhar a descoberta com o mundo', e:{ri:10,r:8,ec:-3} },
+    { t:'Patentear e vender licenças estrategicamente', e:{ec:12,r:-4} },
+    { t:'Regular o uso com cautela ética', e:{es:5,k:6,ec:2} },
+  ]},
+{ id:'u14', tt:'Protestos Ambientais Massivos', em:'🌳', d:'Milhões de cidadãos protestam nas ruas exigindo ações urgentes contra a crise climática.',
+  o:[
+    { t:'Anunciar metas ambiciosas de sustentabilidade', e:{k:8,r:5,ec:-6} },
+    { t:'Reprimir os protestos com força', e:{es:4,k:-12,r:-10} },
+    { t:'Dialogar e criar plano de transição gradual', e:{k:5,es:3,ec:-3} },
+    { t:'Ignorar os protestos completamente', e:{k:-6,es:-6,r:-4} },
+  ]},
+{ id:'u15', tt:'Crise Energética', em:'⚡', d:'Uma crise no fornecimento de energia provoca apagões e ameaça a produção industrial.',
+  o:[
+    { t:'Racionamento de energia planejado', e:{q:-5,es:3,ec:-2} },
+    { t:'Investir em energias renováveis com urgência', e:{ec:-8,ed:4,k:6} },
+    { t:'Importar energia a preços altos', e:{ec:-10,ri:4,q:3} },
+    { t:'Reativar usinas antigas e poluentes', e:{ec:5,q:-6,k:-6} },
+  ]},
+{ id:'u16', tt:'Seca Prolongada', em:'☀️', d:'Uma seca histórica ameaça as reservas de água e a produção agrícola do país.',
+  o:[
+    { t:'Investir em dessalinização e captação de água', e:{ec:-10,q:6,ed:3} },
+    { t:'Racionar água na população', e:{q:-6,es:-3,ec:2} },
+    { t:'Ajudar agricultores afetados com subsídios', e:{ec:-6,es:4,k:4} },
+    { t:'Não intervir, deixar o mercado ajustar', e:{k:-8,q:-6,ec:3} },
+  ]},
+{ id:'u17', tt:'Infraestrutura em Colapso', em:'🌉', d:'Pontes, estradas e sistemas de saneamento antigos começam a falhar em todo o país.',
+  o:[
+    { t:'Plano nacional de reconstrução de infraestrutura', e:{ec:-12,q:8,es:5} },
+    { t:'Priorizar apenas áreas críticas', e:{ec:-6,q:4,es:2} },
+    { t:'Buscar investimento privado (PPPs)', e:{ec:3,r:-3,q:4} },
+    { t:'Adiar manutenção indefinidamente', e:{q:-10,es:-6,k:-5} },
+  ]},
+{ id:'u18', tt:'Escândalo de Corrupção', em:'🕵️', d:'Investigações revelam um esquema de corrupção envolvendo altos funcionários do governo.',
+  o:[
+    { t:'Investigação transparente e punição exemplar', e:{k:10,r:8,es:-4} },
+    { t:'Encobrir o escândalo discretamente', e:{k:-14,r:-10,es:3} },
+    { t:'Reforma anticorrupção ampla', e:{k:8,es:4,ec:-3} },
+    { t:'Culpar apenas um bode expiatório', e:{k:-4,r:-4,es:2} },
+  ]},
+{ id:'u19', tt:'Crise na Mídia Nacional', em:'📰', d:'Grandes veículos de imprensa acusam o governo de censura enquanto denunciam fake news.',
+  o:[
+    { t:'Garantir liberdade total de imprensa', e:{k:7,r:6,es:-3} },
+    { t:'Criar agência de checagem de fatos', e:{k:4,ed:3,es:2} },
+    { t:'Impor restrições a veículos críticos', e:{es:5,k:-10,r:-8} },
+    { t:'Ignorar a crise e seguir em frente', e:{k:-3,es:-3} },
+  ]},
+{ id:'u20', tt:'Crise no Judiciário', em:'⚖️', d:'O sistema judiciário enfrenta acusações de parcialidade e sobrecarga de processos.',
+  o:[
+    { t:'Reforma judicial independente', e:{k:7,es:4,ec:-4} },
+    { t:'Nomear aliados políticos para cargos-chave', e:{es:5,k:-10,r:-6} },
+    { t:'Investir em digitalização e agilidade processual', e:{ed:4,es:3,ec:-3} },
+    { t:'Não intervir no Judiciário', e:{es:-3,k:2} },
+  ]},
+{ id:'u21', tt:'Crise de Refugiados', em:'🚶', d:'Um grande fluxo de refugiados busca abrigo nas fronteiras da nação, fugindo de conflitos vizinhos.',
+  o:[
+    { t:'Abrir as fronteiras e acolher refugiados', e:{k:10,r:8,ec:-8,es:-3} },
+    { t:'Aceitar número limitado com triagem', e:{k:4,es:2,ri:3} },
+    { t:'Fechar as fronteiras completamente', e:{k:-12,r:-8,es:4} },
+    { t:'Pedir que organismos internacionais assumam o custo', e:{ri:-4,ec:2,k:-2} },
+  ]},
+{ id:'u22', tt:'Automação em Massa', em:'🤖', d:'A automação substitui milhares de trabalhadores em fábricas e serviços, gerando desemprego.',
+  o:[
+    { t:'Criar renda básica para trabalhadores afetados', e:{q:8,ec:-8,k:5} },
+    { t:'Investir em requalificação para novas funções', e:{ed:8,ec:-4,q:3} },
+    { t:'Taxar empresas que automatizam', e:{ec:4,r:-3,es:2} },
+    { t:'Não intervir, deixar o mercado se ajustar', e:{ec:5,q:-8,k:-4} },
+  ]},
+{ id:'u23', tt:'Ataque Cibernético Nacional', em:'💻', d:'Hackers atacam sistemas governamentais críticos, expondo dados e paralisando serviços.',
+  o:[
+    { t:'Investir pesado em cibersegurança nacional', e:{ec:-8,es:5,ed:4} },
+    { t:'Culpar publicamente nação estrangeira suspeita', e:{ri:-8,fm:2,es:-2} },
+    { t:'Resposta discreta e reforço silencioso', e:{es:4,ec:-4} },
+    { t:'Ignorar o ataque publicamente', e:{k:-6,es:-6,r:-4} },
+  ]},
+{ id:'u24', tt:'Revolução da Inteligência Artificial', em:'🧠', d:'A IA avança rapidamente, prometendo produtividade mas ameaçando empregos e privacidade.',
+  o:[
+    { t:'Regular a IA com leis rígidas', e:{es:5,ed:3,ec:-4} },
+    { t:'Investir agressivamente sem regulação', e:{ec:10,es:-5,k:-3} },
+    { t:'Equilíbrio entre inovação e proteção social', e:{ed:6,ec:3,q:2} },
+    { t:'Proibir certas aplicações de IA', e:{es:3,ec:-6,k:3} },
+  ]},
+{ id:'u25', tt:'Programa de Exploração Espacial', em:'🚀', d:'Cientistas propõem um ambicioso programa espacial nacional, prometendo prestígio e tecnologia.',
+  o:[
+    { t:'Financiar totalmente o programa espacial', e:{ed:8,ri:6,ec:-10} },
+    { t:'Buscar parceria internacional para dividir custos', e:{ri:8,ed:4,ec:-3} },
+    { t:'Investir modestamente, sem prioridade', e:{ed:2,ec:-2} },
+    { t:'Cancelar o programa, focar em problemas internos', e:{ec:4,ed:-3,r:-2} },
+  ]},
+{ id:'u26', tt:'Crise na Agricultura Sustentável', em:'🌾', d:'Agricultores pressionam por apoio à transição para práticas mais sustentáveis.',
+  o:[
+    { t:'Subsidiar agricultura orgânica e sustentável', e:{ec:-6,q:6,k:5} },
+    { t:'Manter práticas convencionais por produtividade', e:{ec:5,q:-4,k:-3} },
+    { t:'Programa misto de transição gradual', e:{ec:-2,q:3,es:2} },
+    { t:'Ignorar as demandas dos agricultores', e:{k:-5,es:-4} },
+  ]},
+{ id:'u27', tt:'Boom de Crescimento Econômico', em:'📈', d:'A economia nacional surpreende com crescimento acelerado, gerando novas oportunidades.',
+  o:[
+    { t:'Investir o excedente em programas sociais', e:{q:8,k:6,ec:-3} },
+    { t:'Reduzir impostos para impulsionar ainda mais', e:{ec:8,r:4,q:-2} },
+    { t:'Guardar reservas para tempos difíceis', e:{es:6,ec:2} },
+    { t:'Investir em expansão militar', e:{fm:10,ri:-4,ec:-3} },
+  ]},
+{ id:'u28', tt:'Avanço na Medicina', em:'💊', d:'Pesquisadores nacionais desenvolvem um tratamento inovador para uma doença grave.',
+  o:[
+    { t:'Distribuir gratuitamente à população', e:{q:10,k:8,ec:-6} },
+    { t:'Exportar o tratamento para gerar receita', e:{ec:10,ri:4,r:-2} },
+    { t:'Parceria público-privada para produção em massa', e:{q:6,ec:4,r:3} },
+    { t:'Vender a preços altos apenas para elite', e:{ec:8,k:-10,r:-8} },
+  ]},
+{ id:'u29', tt:'Escassez de Água Potável', em:'🚰', d:'Grandes centros urbanos enfrentam escassez crítica de água potável.',
+  o:[
+    { t:'Investimento emergencial em saneamento', e:{ec:-9,q:8,es:3} },
+    { t:'Racionamento rígido nas cidades', e:{q:-6,es:-3,ec:2} },
+    { t:'Parceria internacional para tecnologia hídrica', e:{ri:6,ec:-4,q:5} },
+    { t:'Priorizar indústrias sobre consumo doméstico', e:{ec:6,q:-10,k:-8} },
+  ]},
+{ id:'u30', tt:'Onda de Criminalidade Urbana', em:'🚨', d:'Os índices de criminalidade sobem drasticamente nas grandes cidades, gerando pânico social.',
+  o:[
+    { t:'Reforçar policiamento com mão pesada', e:{es:6,k:-6,r:-3} },
+    { t:'Investir em programas sociais preventivos', e:{q:5,ed:4,ec:-6,k:5} },
+    { t:'Combinar segurança e prevenção social', e:{es:4,q:3,ec:-4} },
+    { t:'Ignorar o problema, cortar gastos com segurança', e:{ec:5,es:-8,k:-6} },
+  ]},
+];
+/* =========================================================================
+   KARMA: GOVERNANDO NAÇÕES — DADOS DO JOGO (parte 2)
+   36 situações específicas por sistema de governo (12 cada).
+   ========================================================================= */
 
-        // ---------- PRÓXIMO TURNO ----------
-        function proximoTurno() {
-            G.turno++;
-            G.waitingNextTurn = false;
-            document.getElementById('next-turn-btn').style.display = 'none';
-            document.getElementById('result-area').innerHTML = '';
+const EVENTOS_PRESIDENCIALISMO = [
+{ id:'p01', tt:'Conflito com o Congresso', em:'🏛️', d:'O Congresso bloqueia suas principais propostas, acusando o presidente de autoritarismo.',
+  o:[
+    { t:'Negociar concessões com a oposição', e:{es:5,r:3,ec:-2} },
+    { t:'Governar por decretos presidenciais', e:{es:-6,k:-4,fm:2} },
+    { t:'Fazer campanha pública contra o Congresso', e:{r:-4,k:2,es:-4} },
+    { t:'Ceder totalmente à agenda do Congresso', e:{es:4,k:-2,r:-2} },
+  ]},
+{ id:'p02', tt:'Ameaça de Impeachment', em:'⚠️', d:'Parlamentares protocolam um pedido de impeachment contra o presidente por suposta má gestão.',
+  o:[
+    { t:'Defender-se publicamente com transparência', e:{k:5,r:4,es:-3} },
+    { t:'Negociar apoio político para barrar o processo', e:{es:5,k:-4,r:-3} },
+    { t:'Convocar apoiadores para pressionar o Congresso', e:{es:-6,r:-2,k:2} },
+    { t:'Aceitar cooperar com a investigação', e:{k:6,r:5,es:-4} },
+  ]},
+{ id:'p03', tt:'Popularidade em Queda', em:'📉', d:'Pesquisas mostram queda acentuada na aprovação popular do governo presidencial.',
+  o:[
+    { t:'Reformular o discurso e ouvir o povo', e:{r:6,k:3,es:2} },
+    { t:'Anunciar pacote populista de curto prazo', e:{r:8,ec:-8,k:-2} },
+    { t:'Ignorar as pesquisas e manter o rumo', e:{es:2,r:-4} },
+    { t:'Trocar ministros para dar satisfação pública', e:{es:-3,r:4,k:2} },
+  ]},
+{ id:'p04', tt:'Plano de Infraestrutura Presidencial', em:'🏗️', d:'O presidente propõe um grande plano nacional de infraestrutura como marca de seu governo.',
+  o:[
+    { t:'Aprovar plano ambicioso financiado por dívida', e:{q:8,ec:-10,es:2} },
+    { t:'Versão reduzida, financiada por impostos', e:{q:4,ec:-3,r:-2} },
+    { t:'Buscar investimento privado internacional', e:{q:5,ri:5,ec:2} },
+    { t:'Cancelar o plano por falta de consenso', e:{q:-4,k:-3,es:2} },
+  ]},
+{ id:'p05', tt:'Crise Política no Executivo', em:'🔥', d:'Ministros-chave pedem demissão em meio a divergências internas no governo.',
+  o:[
+    { t:'Reformar o ministério com novos nomes', e:{es:4,k:2,r:2} },
+    { t:'Manter a equipe e projetar unidade', e:{es:-3,k:-2} },
+    { t:'Convocar eleições antecipadas de confiança', e:{es:-6,r:5,k:3} },
+    { t:'Concentrar mais poder no próprio gabinete', e:{es:3,k:-6,r:-4} },
+  ]},
+{ id:'p06', tt:'Orçamento Presidencial', em:'💵', d:'O presidente precisa definir prioridades no orçamento anual em meio a recursos limitados.',
+  o:[
+    { t:'Priorizar saúde e educação', e:{q:6,ed:6,ec:-6} },
+    { t:'Priorizar segurança e infraestrutura', e:{es:5,fm:4,ec:-4} },
+    { t:'Priorizar redução da dívida pública', e:{ec:8,q:-4,es:2} },
+    { t:'Distribuir igualmente entre todas as áreas', e:{q:2,ed:2,es:2,ec:-2} },
+  ]},
+{ id:'p07', tt:'Eleições Presidenciais se Aproximam', em:'🗳️', d:'Com eleições próximas, o presidente precisa decidir como conduzir sua campanha de reeleição.',
+  o:[
+    { t:'Fazer campanha baseada em resultados concretos', e:{r:6,k:3} },
+    { t:'Prometer reformas populistas ambiciosas', e:{r:8,k:-4,es:-2} },
+    { t:'Focar em ataques à oposição', e:{r:-4,es:-3,k:-4} },
+    { t:'Manter-se acima da disputa, focar em governar', e:{k:5,es:3,r:-2} },
+  ]},
+{ id:'p08', tt:'Reforma Constitucional', em:'📜', d:'O presidente propõe mudanças na Constituição para ampliar poderes do Executivo.',
+  o:[
+    { t:'Buscar ampla consulta popular antes de agir', e:{k:6,es:3,r:4} },
+    { t:'Aprovar rapidamente com maioria aliada', e:{es:-5,k:-6,fm:2} },
+    { t:'Abandonar a proposta por falta de consenso', e:{k:2,es:2,r:1} },
+    { t:'Negociar versão limitada com a oposição', e:{es:4,r:3,k:2} },
+  ]},
+{ id:'p09', tt:'Crise de Segurança Nacional', em:'🛡️', d:'Serviços de inteligência alertam sobre ameaças à segurança nacional que exigem resposta presidencial.',
+  o:[
+    { t:'Reforçar as forças armadas imediatamente', e:{fm:8,ec:-5,es:3} },
+    { t:'Buscar solução diplomática antes de agir', e:{ri:6,es:2,fm:-2} },
+    { t:'Convocar sessão de emergência com o Congresso', e:{es:4,r:2} },
+    { t:'Agir unilateralmente sem consultar ninguém', e:{fm:6,k:-6,es:-4} },
+  ]},
+{ id:'p10', tt:'Comunicação Presidencial em Crise', em:'📢', d:'Erros de comunicação do gabinete presidencial geram confusão e desconfiança pública.',
+  o:[
+    { t:'Centralizar toda comunicação no presidente', e:{es:3,r:2} },
+    { t:'Contratar equipe especializada de comunicação', e:{ec:-3,r:5,es:2} },
+    { t:'Reduzir aparições públicas até estabilizar', e:{es:2,r:-3} },
+    { t:'Ignorar o problema, seguir como antes', e:{r:-6,k:-2} },
+  ]},
+{ id:'p11', tt:'Crise de Governabilidade', em:'🌪️', d:'O presidente enfrenta dificuldade crescente para aprovar qualquer pauta no Congresso.',
+  o:[
+    { t:'Formar ampla coalizão multipartidária', e:{es:6,r:3,k:2} },
+    { t:'Distribuir cargos em troca de apoio político', e:{es:5,k:-8,r:-4} },
+    { t:'Apelar diretamente à população contra o Congresso', e:{r:4,es:-6,k:-2} },
+    { t:'Reduzir a agenda legislativa ao mínimo essencial', e:{es:3,q:-2} },
+  ]},
+{ id:'p12', tt:'Discurso à Nação', em:'🎤', d:'O presidente precisa se dirigir à nação em um momento crucial de seu mandato.',
+  o:[
+    { t:'Discurso de transparência total sobre os desafios', e:{k:6,r:5,es:2} },
+    { t:'Discurso otimista focado em conquistas', e:{r:6,k:1} },
+    { t:'Discurso duro contra opositores políticos', e:{r:-5,es:-4,k:-3} },
+    { t:'Discurso de convocação à união nacional', e:{k:5,es:5,r:3} },
+  ]},
+];
 
-            // Verificar vitória/derrota
-            if (G.karma >= 100) { finalizarPartida(true); return; }
-            if (G.karma <= 0) { finalizarPartida(false); return; }
+const EVENTOS_PARLAMENTARISMO = [
+{ id:'pa01', tt:'Moção de Confiança', em:'🏛️', d:'O parlamento convoca uma moção de confiança que pode derrubar o governo do primeiro-ministro.',
+  o:[
+    { t:'Negociar apoio de última hora com partidos menores', e:{es:5,k:-2,r:2} },
+    { t:'Enfrentar a votação sem concessões', e:{es:-6,k:4,r:2} },
+    { t:'Oferecer cargos-chave em troca de votos', e:{es:4,k:-8,r:-4} },
+    { t:'Antecipar-se e convocar novas eleições', e:{es:-4,r:5,k:3} },
+  ]},
+{ id:'pa02', tt:'Coalizão em Crise', em:'🤝', d:'Partidos da coalizão governista ameaçam romper a aliança por divergências ideológicas.',
+  o:[
+    { t:'Ceder pautas importantes para manter a coalizão', e:{es:5,k:-3,r:-2} },
+    { t:'Deixar a coalizão se romper e formar nova base', e:{es:-6,k:3,r:2} },
+    { t:'Mediar um acordo intermediário entre as partes', e:{es:4,r:3,k:2} },
+    { t:'Governar em minoria, caso a caso', e:{es:-4,k:2} },
+  ]},
+{ id:'pa03', tt:'Orçamento Rejeitado', em:'💵', d:'O parlamento rejeita o orçamento anual proposto pelo governo, gerando incerteza fiscal.',
+  o:[
+    { t:'Reformular o orçamento com concessões', e:{es:4,ec:-3,r:2} },
+    { t:'Insistir na proposta original e negociar votos', e:{es:-4,ec:2,k:-2} },
+    { t:'Convocar eleições sobre o impasse orçamentário', e:{es:-6,r:4,k:2} },
+    { t:'Aprovar orçamento provisório de emergência', e:{es:3,ec:-2} },
+  ]},
+{ id:'pa04', tt:'Reforma Política', em:'📜', d:'Há pressão popular por uma reforma no sistema eleitoral e parlamentar.',
+  o:[
+    { t:'Liderar reforma ampla e transparente', e:{k:7,r:5,es:2} },
+    { t:'Reforma limitada para acalmar pressão', e:{k:3,r:2} },
+    { t:'Bloquear a reforma para proteger o status quo', e:{k:-8,r:-6,es:2} },
+    { t:'Delegar decisão a uma comissão independente', e:{k:4,es:3} },
+  ]},
+{ id:'pa05', tt:'Voto de Desconfiança', em:'❌', d:'A oposição articula um voto de desconfiança contra o primeiro-ministro.',
+  o:[
+    { t:'Defender o governo com dados e resultados', e:{k:4,r:3,es:2} },
+    { t:'Fazer acordos de bastidores para sobreviver', e:{es:4,k:-6,r:-3} },
+    { t:'Aceitar o desafio e arriscar nova eleição', e:{es:-5,r:4,k:3} },
+    { t:'Reformar o gabinete preventivamente', e:{es:3,r:2} },
+  ]},
+{ id:'pa06', tt:'Crise de Liderança no Partido', em:'👥', d:'Membros do próprio partido do primeiro-ministro questionam sua liderança.',
+  o:[
+    { t:'Convocar congresso partidário para resolver', e:{es:3,r:2} },
+    { t:'Reforçar a liderança com apoio da base', e:{r:4,k:2} },
+    { t:'Ceder espaço a rivais internos', e:{es:2,k:-3,r:-2} },
+    { t:'Ignorar as críticas e seguir governando', e:{es:-3,r:-3} },
+  ]},
+{ id:'pa07', tt:'Conflito com o Senado', em:'🏛️', d:'A câmara alta bloqueia sistematicamente projetos aprovados pela câmara baixa.',
+  o:[
+    { t:'Negociar diretamente com líderes do Senado', e:{es:5,r:3} },
+    { t:'Pressionar publicamente o Senado', e:{r:-3,es:-3,k:2} },
+    { t:'Propor reforma dos poderes do Senado', e:{k:5,es:-4,r:2} },
+    { t:'Aceitar impasse e reduzir agenda', e:{es:2,q:-2} },
+  ]},
+{ id:'pa08', tt:'Crise Fiscal Parlamentar', em:'💸', d:'O parlamento debate medidas de austeridade em meio a dívida crescente.',
+  o:[
+    { t:'Aprovar austeridade rígida', e:{ec:9,q:-8,r:-4} },
+    { t:'Austeridade moderada com proteção social', e:{ec:4,q:-2,es:2} },
+    { t:'Rejeitar austeridade e buscar crescimento', e:{ec:-6,q:5,r:3} },
+    { t:'Aumentar impostos sobre altas rendas', e:{ec:5,r:2,es:-2} },
+  ]},
+{ id:'pa09', tt:'Eleições Antecipadas', em:'🗳️', d:'A instabilidade parlamentar leva à possibilidade de eleições antecipadas.',
+  o:[
+    { t:'Convocar eleições e buscar novo mandato', e:{es:-5,r:5,k:3} },
+    { t:'Evitar eleições a todo custo', e:{es:3,k:-4,r:-3} },
+    { t:'Propor governo de unidade nacional', e:{es:6,k:4,r:3} },
+    { t:'Deixar o parlamento decidir o rumo', e:{es:1,k:2} },
+  ]},
+{ id:'pa10', tt:'Plano de Infraestrutura Parlamentar', em:'🏗️', d:'O parlamento debate um grande investimento em infraestrutura nacional.',
+  o:[
+    { t:'Aprovar plano robusto financiado por dívida', e:{q:8,ec:-9} },
+    { t:'Versão enxuta e fiscalmente responsável', e:{q:4,ec:-2} },
+    { t:'Buscar parcerias público-privadas', e:{q:5,ri:4,ec:1} },
+    { t:'Rejeitar o plano por restrição orçamentária', e:{q:-4,k:-2} },
+  ]},
+{ id:'pa11', tt:'Discurso do Primeiro-Ministro', em:'🎤', d:'O primeiro-ministro precisa se posicionar publicamente sobre os rumos do governo.',
+  o:[
+    { t:'Discurso de transparência e humildade', e:{k:6,r:5} },
+    { t:'Discurso de firmeza e determinação', e:{es:4,r:2} },
+    { t:'Discurso conciliador com a oposição', e:{es:4,k:3,r:2} },
+    { t:'Discurso combativo contra críticos', e:{r:-4,es:-3,k:-2} },
+  ]},
+{ id:'pa12', tt:'Crise de Governabilidade Parlamentar', em:'🌪️', d:'A fragmentação partidária torna quase impossível aprovar qualquer legislação.',
+  o:[
+    { t:'Construir grande coalizão de unidade', e:{es:6,r:3} },
+    { t:'Governar por acordos pontuais, tema a tema', e:{es:1,k:2} },
+    { t:'Distribuir benesses para garantir apoio', e:{es:4,k:-7,r:-4} },
+    { t:'Aceitar paralisia e aguardar novo ciclo eleitoral', e:{es:-6,q:-4} },
+  ]},
+];
 
-            // Verificar se há guerra ativa
-            if (G.guerra) {
-                iniciarGuerraTela();
-                return;
-            }
+const EVENTOS_SEMIPRESIDENCIALISMO = [
+{ id:'s01', tt:'Coabitação Conflituosa', em:'⚔️', d:'O presidente e o primeiro-ministro, de partidos rivais, entram em conflito aberto sobre políticas.',
+  o:[
+    { t:'Buscar divisão clara e cooperativa de poderes', e:{es:6,k:3,r:2} },
+    { t:'Disputa pública de poder entre os dois cargos', e:{es:-7,r:-4,k:-2} },
+    { t:'Presidente cede espaço ao primeiro-ministro', e:{es:3,k:2,r:-1} },
+    { t:'Primeiro-ministro é pressionado a renunciar', e:{es:-5,k:-5,r:-3} },
+  ]},
+{ id:'s02', tt:'Disputa Orçamentária', em:'💵', d:'Presidência e governo divergem sobre prioridades no orçamento nacional.',
+  o:[
+    { t:'Negociar um orçamento de consenso', e:{es:5,r:2} },
+    { t:'Presidente impõe suas prioridades', e:{es:-4,k:-3,fm:2} },
+    { t:'Primeiro-ministro prevalece no Legislativo', e:{es:-2,r:2} },
+    { t:'Impasse leva a cortes automáticos', e:{ec:3,q:-6,es:-3} },
+  ]},
+{ id:'s03', tt:'Crise de Competência Institucional', em:'📋', d:'Fica incerto quem tem autoridade para decidir sobre uma crise externa: presidente ou PM.',
+  o:[
+    { t:'Buscar mediação da Corte Constitucional', e:{es:5,k:4} },
+    { t:'Presidente assume o controle unilateralmente', e:{es:-5,fm:3,k:-3} },
+    { t:'Ação conjunta e coordenada', e:{es:4,r:3,k:2} },
+    { t:'Paralisia por falta de decisão', e:{es:-6,q:-3} },
+  ]},
+{ id:'s04', tt:'Reforma Constitucional Semipresidencial', em:'📜', d:'Debate-se reformar a divisão de poderes entre presidência e governo.',
+  o:[
+    { t:'Reforma para clarificar papéis, aprovada por referendo', e:{k:7,es:5} },
+    { t:'Reforma que fortalece o presidente', e:{es:-3,fm:3,k:-2} },
+    { t:'Reforma que fortalece o parlamento', e:{es:2,r:3} },
+    { t:'Abandonar a reforma por falta de consenso', e:{k:-2,es:1} },
+  ]},
+{ id:'s05', tt:'Eleições Legislativas', em:'🗳️', d:'Eleições legislativas se aproximam, podendo mudar drasticamente o equilíbrio de poder.',
+  o:[
+    { t:'Campanha baseada em resultados de governo', e:{r:5,k:2} },
+    { t:'Campanha de polarização entre presidência e PM', e:{r:-4,es:-4} },
+    { t:'Buscar acordo de governabilidade pós-eleição', e:{es:4,k:3} },
+    { t:'Manter-se neutro durante a campanha', e:{k:3,es:2} },
+  ]},
+{ id:'s06', tt:'Crise de Comunicação Institucional', em:'📢', d:'Presidência e governo dão declarações contraditórias à imprensa, confundindo a população.',
+  o:[
+    { t:'Unificar porta-vozes e mensagens', e:{es:4,r:3} },
+    { t:'Cada lado comunica separadamente', e:{es:-3,r:-2} },
+    { t:'Presidente assume protagonismo comunicacional', e:{es:-2,k:1} },
+    { t:'Silêncio institucional até resolver internamente', e:{r:-3,es:2} },
+  ]},
+{ id:'s07', tt:'Crise Diplomática', em:'🌐', d:'Um incidente internacional exige resposta rápida, mas presidente e PM discordam sobre a abordagem.',
+  o:[
+    { t:'Resposta diplomática conjunta e unificada', e:{ri:7,es:4} },
+    { t:'Presidente conduz a política externa sozinho', e:{ri:2,es:-4,fm:2} },
+    { t:'Primeiro-ministro negocia via parlamento', e:{ri:4,es:-2} },
+    { t:'Resposta atrasada por desacordo interno', e:{ri:-6,es:-4} },
+  ]},
+{ id:'s08', tt:'Política Econômica Dividida', em:'📊', d:'Presidência e governo têm visões opostas sobre como conduzir a política econômica.',
+  o:[
+    { t:'Plano econômico de consenso entre os dois', e:{ec:6,es:4} },
+    { t:'Presidente impõe agenda liberal', e:{ec:5,q:-4,es:-3} },
+    { t:'Primeiro-ministro impõe agenda social', e:{q:5,ec:-4,es:-3} },
+    { t:'Paralisia gera incerteza nos mercados', e:{ec:-8,es:-4} },
+  ]},
+{ id:'s09', tt:'Reforma do Estado', em:'🏢', d:'Discute-se uma ampla reforma administrativa para reduzir a burocracia estatal.',
+  o:[
+    { t:'Reforma ampla e bem planejada', e:{ec:6,q:3,es:3} },
+    { t:'Reforma apressada e mal recebida', e:{ec:4,q:-5,r:-3} },
+    { t:'Reforma mínima, apenas simbólica', e:{ec:1,k:1} },
+    { t:'Cancelar reforma por resistência política', e:{k:-2,es:1} },
+  ]},
+{ id:'s10', tt:'Crise de Governabilidade Semipresidencial', em:'🌪️', d:'A divisão de poder entre presidência e governo trava decisões urgentes do país.',
+  o:[
+    { t:'Criar protocolo formal de cooperação', e:{es:6,k:3} },
+    { t:'Presidente centraliza decisões críticas', e:{es:-4,fm:3,k:-3} },
+    { t:'Parlamento assume papel de mediador', e:{es:3,r:2} },
+    { t:'Convocar eleições antecipadas para resolver impasse', e:{es:-5,r:4} },
+  ]},
+{ id:'s11', tt:'Discurso Conjunto à Nação', em:'🎤', d:'Presidente e primeiro-ministro precisam decidir se falam juntos ou separadamente à nação.',
+  o:[
+    { t:'Discurso conjunto mostrando unidade', e:{k:6,es:5,r:3} },
+    { t:'Discursos separados e divergentes', e:{es:-5,r:-3,k:-2} },
+    { t:'Apenas o presidente se pronuncia', e:{es:-2,k:1} },
+    { t:'Apenas o primeiro-ministro se pronuncia', e:{es:-2,r:1} },
+  ]},
+{ id:'s12', tt:'Reforma dos Poderes', em:'⚖️', d:'Uma comissão propõe redefinir os limites de poder entre presidência e parlamento definitivamente.',
+  o:[
+    { t:'Aprovar reforma equilibrada por referendo', e:{k:8,es:6,r:3} },
+    { t:'Reforma que favorece a presidência', e:{fm:4,es:-4,k:-3} },
+    { t:'Reforma que favorece o parlamento', e:{r:3,es:-2} },
+    { t:'Rejeitar qualquer mudança no sistema atual', e:{k:-3,es:2} },
+  ]},
+];
 
-            // Gerar evento
-            const evento = gerarEvento();
-            document.getElementById('event-title').textContent = evento.titulo;
-            document.getElementById('event-desc').textContent = evento.desc;
+const EVENTOS_GOVERNO = {
+  presidencialismo: EVENTOS_PRESIDENCIALISMO,
+  parlamentarismo: EVENTOS_PARLAMENTARISMO,
+  semipresidencialismo: EVENTOS_SEMIPRESIDENCIALISMO,
+};
+/* =========================================================================
+   KARMA: GOVERNANDO NAÇÕES — DADOS DO JOGO (parte 3)
+   Sistema de guerra avançado: 7 fases com 4 opções estratégicas cada.
+   Chaves de efeito adicionais (além dos indicadores globais k/ec/r/q/es/ri/fm/ed):
+     def  = defesas (0-100)      moral = moral das tropas (0-100)
+     bx   = baixas acumuladas     rec  = recursos de guerra (0-100)
+     al   = aliados (contagem)    fi   = variação na força do inimigo
+   ========================================================================= */
 
-            const container = document.getElementById('options-container');
-            container.innerHTML = '';
-            evento.opcoes.forEach((op, idx) => {
-                const btn = document.createElement('button');
-                btn.className = 'btn btn-secondary';
-                btn.textContent = op.texto;
-                btn.dataset.idx = idx;
-                btn.addEventListener('click', () => escolherOpcao(idx, evento));
-                container.appendChild(btn);
-            });
-        }
+const FASES_GUERRA = [
+  { fase:1, nome:'Planejamento', emoji:'📋',
+    desc:'A guerra está prestes a começar. É hora de preparar a nação para o conflito que se aproxima.',
+    o:[
+      { t:'Reforçar a economia de guerra', e:{ec:5,fm:4,rec:12,es:-2} },
+      { t:'Treinar tropas intensivamente', e:{fm:8,es:-4,moral:10,rec:-5} },
+      { t:'Buscar mais aliados internacionais', e:{ri:6,fm:3,al:1,rec:5} },
+      { t:'Fortalecer defesas fronteiriças', e:{def:12,ec:-6,rec:-8} },
+    ]},
+  { fase:2, nome:'Ataque', emoji:'💥',
+    desc:'As forças nacionais avançam sobre posições inimigas. Escolha a estratégia ofensiva.',
+    o:[
+      { t:'Ataque surpresa total', e:{fm:6,bx:8,moral:6,rec:-10,fi:-6} },
+      { t:'Ataque cirúrgico estratégico', e:{fm:4,r:5,rec:-6,fi:-4} },
+      { t:'Bombardeio de infraestrutura inimiga', e:{fm:5,ec:-4,bx:5,rec:-10,fi:-8} },
+      { t:'Avanço terrestre coordenado', e:{fm:5,bx:9,moral:-4,rec:-8,fi:-5} },
+    ]},
+  { fase:3, nome:'Defesa', emoji:'🛡️',
+    desc:'O inimigo contra-ataca com força. É preciso segurar as posições nacionais.',
+    o:[
+      { t:'Defesa em profundidade', e:{def:10,fm:4,rec:-6} },
+      { t:'Fortificar posições-chave', e:{def:8,ec:-5,rec:-4} },
+      { t:'Guerra de atrito prolongada', e:{fm:5,moral:-6,bx:8,rec:-9} },
+      { t:'Campanha de desinformação e contrainteligência', e:{moral:8,fm:3,r:-5,rec:-4} },
+    ]},
+  { fase:4, nome:'Contra-ataque', emoji:'🗡️',
+    desc:'Chegou o momento de retomar a iniciativa e reverter o curso do conflito.',
+    o:[
+      { t:'Contra-ataque maciço em toda a frente', e:{fm:6,bx:8,moral:6,rec:-10,fi:-6} },
+      { t:'Contra-ataque preciso e calculado', e:{fm:4,r:5,rec:-6,fi:-4} },
+      { t:'Flanqueamento estratégico', e:{fm:5,moral:5,rec:-7,fi:-5} },
+      { t:'Tentativa de cessar-fogo temporário', e:{ri:6,k:4,rec:6,fi:0} },
+    ]},
+  { fase:5, nome:'Ofensiva Total', emoji:'🔥',
+    desc:'O conflito chega a seu ponto mais crítico. É hora da decisão final no campo de batalha.',
+    o:[
+      { t:'Ofensiva geral em todas as frentes', e:{fm:8,bx:10,moral:6,rec:-12,fi:-9} },
+      { t:'Ofensiva concentrada em ponto vital', e:{fm:6,moral:5,rec:-8,fi:-7} },
+      { t:'Estratégia de terra arrasada', e:{fm:7,bx:10,ec:-8,moral:-6,rec:-10,fi:-10,k:-6} },
+      { t:'Propor paz com honra antes do desfecho final', e:{ri:8,k:6,rec:8,fi:0} },
+    ]},
+  { fase:6, nome:'Negociação', emoji:'🕊️',
+    desc:'Diplomatas de ambos os lados se reúnem. É possível encerrar o conflito agora — ou continuar lutando.',
+    o:[
+      { t:'Propor paz justa e equilibrada [ENCERRA A GUERRA]', e:{ri:8,k:8,rec:5}, encerraGuerra:'paz' },
+      { t:'Acordo de cessar-fogo imediato [ENCERRA A GUERRA]', e:{ri:6,k:6,rec:3}, encerraGuerra:'paz' },
+      { t:'Tratado de paz com compensações [ENCERRA A GUERRA]', e:{ri:7,ec:-6,k:7}, encerraGuerra:'paz' },
+      { t:'Recusar negociação e continuar a guerra', e:{fm:4,moral:4,k:-5,rec:-4} },
+    ]},
+  { fase:7, nome:'Desfecho', emoji:'🏁',
+    desc:'O momento final do conflito chegou. Esta decisão determinará o destino da nação.',
+    o:[
+      { t:'Render-se honrosamente para poupar vidas', e:{k:-8,r:-6,rec:-10}, encerraGuerra:'derrota' },
+      { t:'Lutar até o fim, custe o que custar', e:{fm:6,bx:12,moral:6,k:-6}, encerraGuerra:'decisivo' },
+      { t:'Negociar uma paz justa imediatamente', e:{ri:8,k:8,rec:5}, encerraGuerra:'paz' },
+      { t:'Oferecer acordo generoso ao inimigo', e:{ri:7,ec:-7,k:6,rec:3}, encerraGuerra:'paz' },
+    ]},
+];
+/* =========================================================================
+   KARMA: GOVERNANDO NAÇÕES — MOTOR DO JOGO
+   ========================================================================= */
 
-        // ---------- ESCOLHER OPÇÃO ----------
-        function escolherOpcao(idx, evento) {
-            if (G.waitingNextTurn) return;
-            G.waitingNextTurn = true;
+// ---- Estado global do jogo (objeto G) ----
+const G = {
+  nacao: {
+    nome: '',
+    continente: null,
+    governo: null,
+    bandeira: { cores: ['#2e7d32', '#f5f5f5', '#1565c0'], simbolo: '★', estilo: 'horizontal' },
+  },
+  indicadores: { ...IND_INICIAL },
+  turno: 1,
+  historicoEventosIds: [],   // últimos 15 ids de eventos exibidos (evita repetição)
+  historicoDecisoes: [],     // últimas 10 decisões {turno, titulo, escolha}
+  eventoAtual: null,
+  opcaoEscolhidaIdx: null,
+  guerra: null,
+  nacoes: [],
+  fimJogo: false,
+  etapaAtual: 1,
+};
 
-            const op = evento.opcoes[idx];
-            // Aplicar efeitos
-            aplicarEfeitos(op.efeitos);
+function estadoInicial(){
+  G.nacao = { nome:'', continente:null, governo:null, bandeira:{ cores:['#2e7d32','#f5f5f5','#1565c0'], simbolo:'★', estilo:'horizontal' } };
+  G.indicadores = { ...IND_INICIAL };
+  G.turno = 1;
+  G.historicoEventosIds = [];
+  G.historicoDecisoes = [];
+  G.eventoAtual = null;
+  G.opcaoEscolhidaIdx = null;
+  G.guerra = null;
+  G.nacoes = NACOES_BASE.map(n => ({ ...n }));
+  G.fimJogo = false;
+  G.etapaAtual = 1;
+}
+estadoInicial();
 
-            // Verificar se esta opção desencadeia guerra (se houver flag)
-            // Verificar também se alguma relação ficou muito baixa e pode iniciar guerra
-            let guerraDeclarada = false;
-            let inimigo = null;
-            // Se a escolha foi agressiva e alguma nação hostil, pode iniciar guerra
-            if (op.texto.includes('⚔️') || op.texto.includes('ameaça') || op.texto.includes('mobilizar forças') || op.texto.includes('ataque')) {
-                const hostis = Object.keys(G.nacoes).filter(k => G.nacoes[k].atitude === 'hostil' && G.nacoes[k].relacao < 25);
-                if (hostis.length > 0 && Math.random() < 0.4) {
-                    guerraDeclarada = true;
-                    inimigo = hostis[Math.floor(Math.random() * hostis.length)];
-                }
-            }
-            // Se alguma relação caiu abaixo de 15, chance de guerra
-            for (let k in G.nacoes) {
-                if (G.nacoes[k].relacao < 15 && Math.random() < 0.3) {
-                    guerraDeclarada = true;
-                    inimigo = k;
-                    break;
-                }
-            }
+// ---- Utilidades ----
+function clamp(v, min=0, max=100){ return Math.max(min, Math.min(max, v)); }
+function rand(min, max){ return Math.floor(Math.random() * (max - min + 1)) + min; }
+function escolherAleatorio(arr){ return arr[rand(0, arr.length - 1)]; }
+function $(sel){ return document.querySelector(sel); }
+function $all(sel){ return Array.from(document.querySelectorAll(sel)); }
+function mostrarTela(id){
+  $all('.screen').forEach(s => s.classList.remove('active'));
+  const el = document.getElementById(id);
+  if (el) el.classList.add('active');
+}
 
-            // Mostrar resultado
-            let html = '<div class="result-box">';
-            html += '<div style="font-size:2.6vh;font-weight:600;color:#f0c27a;">🔁 Consequências:</div>';
-            let hasEffect = false;
-            for (let [key, val] of Object.entries(op.efeitos)) {
-                if (val === 0) continue;
-                hasEffect = true;
-                const label = {
-                    karma: '☯ Karma',
-                    economia: '💰 Economia',
-                    respeito: '🤝 Respeito',
-                    qualidadeVida: '🏥 Qualidade de Vida',
-                    estabilidade: '⚖️ Estabilidade',
-                    relacoesInternacionais: '🌐 Relações Internacionais'
-                } [key] || key;
-                const cls = val > 0 ? 'positive' : 'negative';
-                const sinal = val > 0 ? '+' : '';
-                html += `<div class="result-item">${label}: <span class="${cls}">${sinal}${val}</span></div>`;
-            }
-            if (!hasEffect) html += '<div class="result-item">Nenhuma alteração imediata.</div>';
-            html += '</div>';
-            document.getElementById('result-area').innerHTML = html;
+/* =========================================================================
+   TELA DE CRIAÇÃO — TECLADO VIRTUAL
+   ========================================================================= */
+function initTeclado(){
+  const teclado = $('#teclado');
+  if (!teclado) return;
+  teclado.innerHTML = '';
+  const letras = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ'.split('');
+  letras.forEach(l => {
+    const b = document.createElement('button');
+    b.className = 'btn';
+    b.textContent = l;
+    b.onclick = () => digitarCaractere(l);
+    teclado.appendChild(b);
+  });
+  const espaco = document.createElement('button');
+  espaco.className = 'btn wide';
+  espaco.textContent = 'ESPAÇO';
+  espaco.onclick = () => digitarCaractere(' ');
+  teclado.appendChild(espaco);
 
-            // Verificar novamente vitória/derrota após efeitos
-            if (G.karma >= 100) { finalizarPartida(true); return; }
-            if (G.karma <= 0) { finalizarPartida(false); return; }
+  const apagar = document.createElement('button');
+  apagar.className = 'btn wide';
+  apagar.textContent = '⌫ APAGAR';
+  apagar.onclick = apagarCaractere;
+  teclado.appendChild(apagar);
+}
+function digitarCaractere(c){
+  if (G.nacao.nome.length >= 30) return;
+  G.nacao.nome += c;
+  atualizarNomeDisplay();
+}
+function apagarCaractere(){
+  G.nacao.nome = G.nacao.nome.slice(0, -1);
+  atualizarNomeDisplay();
+}
+function atualizarNomeDisplay(){
+  const disp = $('#nome-display');
+  disp.textContent = G.nacao.nome.length ? G.nacao.nome : '_';
+}
 
-            // Se guerra declarada, iniciar
-            if (guerraDeclarada && inimigo) {
-                G.guerra = {
-                    inimigo: inimigo,
-                    turnoInicio: G.turno,
-                };
-                document.getElementById('next-turn-btn').style.display = 'none';
-                // Mostrar guerra após breve delay
-                setTimeout(() => {
-                    iniciarGuerraTela();
-                }, 800);
-                return;
-            }
+/* =========================================================================
+   TELA DE CRIAÇÃO — CONTINENTE E GOVERNO
+   ========================================================================= */
+const CONTINENTES = ['América', 'Europa', 'África', 'Ásia', 'Oceania'];
+const GOVERNOS = [
+  { id:'presidencialismo', nome:'Presidencialismo', desc:'O presidente acumula chefia de Estado e de governo.' },
+  { id:'parlamentarismo', nome:'Parlamentarismo', desc:'O primeiro-ministro governa com apoio do parlamento.' },
+  { id:'semipresidencialismo', nome:'Semipresidencialismo', desc:'Poder dividido entre presidente e primeiro-ministro.' },
+];
 
-            // Mostrar botão próximo turno
-            document.getElementById('next-turn-btn').style.display = 'inline-block';
-            document.getElementById('next-turn-btn').onclick = () => proximoTurno();
-        }
+function initContinentes(){
+  const cont = $('#opcoes-continente');
+  cont.innerHTML = '';
+  CONTINENTES.forEach(c => {
+    const b = document.createElement('button');
+    b.className = 'btn big';
+    b.textContent = c;
+    b.onclick = () => {
+      G.nacao.continente = c;
+      $all('#opcoes-continente .btn').forEach(x => x.classList.remove('selected'));
+      b.classList.add('selected');
+      $('#continente-selecionado').textContent = 'Selecionado: ' + c;
+    };
+    cont.appendChild(b);
+  });
+}
+function initGovernos(){
+  const cont = $('#opcoes-governo');
+  cont.innerHTML = '';
+  GOVERNOS.forEach(gv => {
+    const b = document.createElement('button');
+    b.className = 'btn big';
+    b.style.maxWidth = '26vw';
+    b.innerHTML = `<div>${gv.nome}</div><div style="font-size:1.5vh; font-weight:400; color:var(--text-dim); margin-top:0.6vh;">${gv.desc}</div>`;
+    b.onclick = () => {
+      G.nacao.governo = gv.id;
+      $all('#opcoes-governo .btn').forEach(x => x.classList.remove('selected'));
+      b.classList.add('selected');
+      $('#governo-selecionado').textContent = 'Selecionado: ' + gv.nome;
+    };
+    cont.appendChild(b);
+  });
+}
 
-        // ---------- GUERRA ----------
-        function iniciarGuerraTela() {
-            if (!G.guerra) return;
-            const inimigoNome = G.guerra.inimigo;
-            const n = G.nacoes[inimigoNome];
-            if (!n) { G.guerra = null;
-                proximoTurno(); return; }
+/* =========================================================================
+   TELA DE CRIAÇÃO — EDITOR DE BANDEIRA
+   ========================================================================= */
+const PALETA_CORES = [
+  '#e63946','#f1a208','#f5f5f5','#1565c0','#2e7d32','#1a1a1a',
+  '#e8c87a','#9b59b6','#00bcd4','#5dade2','#8b4513','#ff6f61',
+  '#4caf50','#2c2c54',
+];
+const SIMBOLOS = ['✖','★','●','◆','✚','☽','☀'];
+let faixaSelecionada = 0;
 
-            mostrarTela('war-screen');
+function desenharBandeira(canvas, bandeira){
+  const ctx = canvas.getContext('2d');
+  const w = canvas.width, h = canvas.height;
+  ctx.clearRect(0, 0, w, h);
+  const cores = bandeira.cores;
+  const estilo = bandeira.estilo || 'horizontal';
 
-            // Calcular forças
-            const militarBase = 50 + Math.floor((G.economia + G.estabilidade + G.respeito) / 6);
-            const aliados = Object.keys(G.nacoes).filter(k => G.nacoes[k].atitude === 'amigável' && k !== inimigoNome);
-            const apoioAliados = aliados.length * 8 + Math.floor(G.relacoesInternacionais / 10);
-            const forcaTotal = militarBase + apoioAliados;
-            const forcaInimiga = n.militar + Math.floor(Math.random() * 20) - 10;
+  if (estilo === 'horizontal'){
+    const fh = h / 3;
+    cores.forEach((c, i) => { ctx.fillStyle = c; ctx.fillRect(0, i * fh, w, fh); });
+  } else if (estilo === 'vertical'){
+    const fw = w / 3;
+    cores.forEach((c, i) => { ctx.fillStyle = c; ctx.fillRect(i * fw, 0, fw, h); });
+  } else if (estilo === 'cruz'){
+    ctx.fillStyle = cores[0]; ctx.fillRect(0, 0, w, h);
+    ctx.fillStyle = cores[1];
+    ctx.fillRect(w*0.4, 0, w*0.2, h);
+    ctx.fillRect(0, h*0.4, w, h*0.2);
+    ctx.fillStyle = cores[2];
+    ctx.fillRect(w*0.46, h*0.46, w*0.08, h*0.08);
+  } else if (estilo === 'diagonal'){
+    ctx.fillStyle = cores[0]; ctx.fillRect(0, 0, w, h);
+    ctx.beginPath(); ctx.moveTo(0,0); ctx.lineTo(w,0); ctx.lineTo(0,h); ctx.closePath();
+    ctx.fillStyle = cores[1]; ctx.fill();
+    ctx.beginPath(); ctx.moveTo(w,h); ctx.lineTo(w,0); ctx.lineTo(0,h); ctx.closePath();
+    ctx.fillStyle = cores[2]; ctx.fill();
+  }
 
-            document.getElementById('war-military').textContent = forcaTotal;
-            document.getElementById('war-allies').textContent = apoioAliados;
-            document.getElementById('war-enemy').textContent = forcaInimiga;
-            document.getElementById('war-info-text').textContent = `⚔️ Conflito com ${n.nome}`;
+  // Símbolo central
+  if (bandeira.simbolo){
+    ctx.fillStyle = '#ffffffdd';
+    ctx.strokeStyle = '#000000aa';
+    ctx.lineWidth = Math.max(1, w * 0.006);
+    ctx.font = `bold ${h * 0.32}px Arial`;
+    ctx.textAlign = 'center';
+    ctx.textBaseline = 'middle';
+    ctx.fillText(bandeira.simbolo, w/2, h/2);
+    ctx.strokeText(bandeira.simbolo, w/2, h/2);
+  }
+  // Borda
+  ctx.strokeStyle = '#00000055';
+  ctx.lineWidth = 2;
+  ctx.strokeRect(1, 1, w-2, h-2);
+}
 
-            document.getElementById('war-result').innerHTML = '';
-            // Habilitar botões
-            document.querySelectorAll('.war-opt').forEach(b => b.disabled = false);
-        }
+function redesenharTodasBandeiras(){
+  ['canvas-bandeira','canvas-resumo-bandeira','canvas-topo-bandeira','canvas-final-bandeira'].forEach(id => {
+    const c = document.getElementById(id);
+    if (c) desenharBandeira(c, G.nacao.bandeira);
+  });
+}
 
-        function escolherEstrategiaGuerra(opt) {
-            if (G.waitingNextTurn) return;
-            G.waitingNextTurn = true;
-            document.querySelectorAll('.war-opt').forEach(b => b.disabled = true);
+function initEditorBandeira(){
+  const canvas = $('#canvas-bandeira');
+  canvas.onclick = (ev) => {
+    const rect = canvas.getBoundingClientRect();
+    const scaleY = canvas.height / rect.height;
+    const scaleX = canvas.width / rect.width;
+    const y = (ev.clientY - rect.top) * scaleY;
+    const x = (ev.clientX - rect.left) * scaleX;
+    const estilo = G.nacao.bandeira.estilo;
+    if (estilo === 'horizontal'){
+      faixaSelecionada = Math.floor(y / (canvas.height/3));
+    } else if (estilo === 'vertical'){
+      faixaSelecionada = Math.floor(x / (canvas.width/3));
+    } else {
+      faixaSelecionada = 0;
+    }
+    faixaSelecionada = clamp(faixaSelecionada, 0, 2);
+    marcarCorSelecionada();
+  };
 
-            const inimigoNome = G.guerra.inimigo;
-            const n = G.nacoes[inimigoNome];
-            const militarBase = 50 + Math.floor((G.economia + G.estabilidade + G.respeito) / 6);
-            const aliados = Object.keys(G.nacoes).filter(k => G.nacoes[k].atitude === 'amigável' && k !== inimigoNome);
-            const apoioAliados = aliados.length * 8 + Math.floor(G.relacoesInternacionais / 10);
-            const forcaTotal = militarBase + apoioAliados;
-            const forcaInimiga = n.militar + Math.floor(Math.random() * 20) - 10;
+  const paleta = $('#paleta-cores');
+  paleta.innerHTML = '';
+  PALETA_CORES.forEach(cor => {
+    const sw = document.createElement('div');
+    sw.className = 'cor-swatch';
+    sw.style.background = cor;
+    sw.onclick = () => {
+      G.nacao.bandeira.cores[faixaSelecionada] = cor;
+      redesenharTodasBandeiras();
+      marcarCorSelecionada();
+    };
+    paleta.appendChild(sw);
+  });
 
-            let vantagem = forcaTotal - forcaInimiga;
-            let modificador = 0;
-            let resultado = '';
-            let karmaGanho = 0;
+  const simbCont = $('#simbolos-container');
+  simbCont.innerHTML = '<h3 style="width:100%; text-align:center; margin-bottom:0.6vh;">Símbolo Central</h3>';
+  SIMBOLOS.forEach(s => {
+    const b = document.createElement('button');
+    b.className = 'btn simbolo-btn';
+    b.textContent = s;
+    b.onclick = () => {
+      G.nacao.bandeira.simbolo = s;
+      redesenharTodasBandeiras();
+      $all('#simbolos-container .btn').forEach(x => x.classList.remove('selected'));
+      b.classList.add('selected');
+    };
+    simbCont.appendChild(b);
+  });
 
-            switch (opt) {
-                case 'attack':
-                    modificador = 10 + Math.floor(Math.random() * 15);
-                    resultado = '⚡ Ataque total!';
-                    break;
-                case 'defense':
-                    modificador = -5 + Math.floor(Math.random() * 10);
-                    resultado = '🛡️ Defesa estratégica.';
-                    break;
-                case 'counter':
-                    modificador = 5 + Math.floor(Math.random() * 12);
-                    resultado = '🔱 Contra-ataque coordenado.';
-                    break;
-                case 'negotiate':
-                    modificador = -15 + Math.floor(Math.random() * 10);
-                    resultado = '🤝 Tentativa de negociação.';
-                    break;
-            }
+  const presetsCont = $('#presets-container');
+  presetsCont.innerHTML = '<h3 style="width:100%; text-align:center; margin-bottom:0.6vh;">Modelos Rápidos</h3>';
+  const presets = [
+    { nome:'Listras H', estilo:'horizontal' },
+    { nome:'Listras V', estilo:'vertical' },
+    { nome:'Cruz', estilo:'cruz' },
+    { nome:'Diagonal', estilo:'diagonal' },
+    { nome:'Três Cores', estilo:'horizontal' },
+  ];
+  presets.forEach(p => {
+    const b = document.createElement('button');
+    b.className = 'btn';
+    b.textContent = p.nome;
+    b.onclick = () => {
+      G.nacao.bandeira.estilo = p.estilo;
+      redesenharTodasBandeiras();
+    };
+    presetsCont.appendChild(b);
+  });
 
-            let forcaFinal = vantagem + modificador;
-            // Aleatoriedade
-            forcaFinal += Math.floor(Math.random() * 20) - 10;
+  desenharBandeira(canvas, G.nacao.bandeira);
+  marcarCorSelecionada();
+}
+function marcarCorSelecionada(){
+  const corAtual = G.nacao.bandeira.cores[faixaSelecionada];
+  $all('#paleta-cores .cor-swatch').forEach(sw => {
+    sw.classList.toggle('selecionada', sw.style.background === hexParaRgb(corAtual));
+  });
+}
+function hexParaRgb(hex){
+  // Converte hex para o formato rgb que o navegador usa em style.background, para comparação
+  const c = document.createElement('canvas').getContext('2d');
+  c.fillStyle = hex;
+  return c.fillStyle.startsWith('#') ? hex : c.fillStyle;
+}
 
-            let venceu = forcaFinal > 0;
-            let mensagem = '';
-            if (venceu) {
-                karmaGanho = 25;
-                G.karma = Math.min(100, G.karma + karmaGanho);
-                mensagem = `🎉 Vitória! Seu exército prevaleceu contra ${n.nome}! Karma +${karmaGanho}.`;
-                // Melhora relações com aliados
-                for (let k in G.nacoes) {
-                    if (G.nacoes[k].atitude === 'amigável') G.nacoes[k].relacao = Math.min(100, G.nacoes[k].relacao + 5);
-                }
-                // Piora relação com inimigo
-                n.relacao = Math.max(0, n.relacao - 20);
-                if (n.relacao < 10) n.atitude = 'hostil';
-            } else {
-                karmaGanho = -100;
-                G.karma = Math.max(0, G.karma + karmaGanho);
-                mensagem = `💀 Derrota devastadora! ${n.nome} venceu a guerra. Karma ${karmaGanho}.`;
-                // Piora tudo
-                G.economia = Math.max(0, G.economia - 15);
-                G.estabilidade = Math.max(0, G.estabilidade - 20);
-                G.respeito = Math.max(0, G.respeito - 20);
-                // Relações pioram
-                for (let k in G.nacoes) {
-                    G.nacoes[k].relacao = Math.max(0, G.nacoes[k].relacao - 10);
-                }
-            }
+/* =========================================================================
+   NAVEGAÇÃO ENTRE ETAPAS DA CRIAÇÃO
+   ========================================================================= */
+function initEtapasNav(){
+  const nav = $('#etapas-nav');
+  nav.innerHTML = '';
+  for (let i = 1; i <= 4; i++){
+    const dot = document.createElement('div');
+    dot.className = 'etapa-dot' + (i === 1 ? ' ativa' : '');
+    dot.dataset.etapa = i;
+    nav.appendChild(dot);
+  }
+}
+function irParaEtapa(n){
+  if (n < 1 || n > 4) return;
+  G.etapaAtual = n;
+  $all('.etapa-conteudo').forEach(el => el.classList.toggle('ativa', Number(el.dataset.etapa) === n));
+  $all('.etapa-dot').forEach(d => {
+    const i = Number(d.dataset.etapa);
+    d.classList.toggle('ativa', i === n);
+    d.classList.toggle('concluida', i < n);
+  });
+  $('#btn-voltar-etapa').disabled = (n === 1);
+  $('#btn-avancar-etapa').textContent = (n === 4) ? 'Iniciar Partida ▶' : 'Avançar ▶';
+}
+function validarEtapaAtual(){
+  if (G.etapaAtual === 1 && !G.nacao.nome.trim()){
+    alert('Por favor, digite um nome para sua nação antes de continuar.');
+    return false;
+  }
+  if (G.etapaAtual === 2 && !G.nacao.continente){
+    alert('Por favor, escolha um continente antes de continuar.');
+    return false;
+  }
+  if (G.etapaAtual === 3 && !G.nacao.governo){
+    alert('Por favor, escolha um sistema de governo antes de continuar.');
+    return false;
+  }
+  return true;
+}
 
-            document.getElementById('war-result').innerHTML = `
-                <div style="font-size:3.2vh;font-weight:700;color:${venceu ? '#4caf84' : '#d45c5c'};">
-                    ${venceu ? '🏆 VITÓRIA' : '💀 DERROTA'}
-                </div>
-                <div style="font-size:2.6vh;margin-top:1vh;">${mensagem}</div>
-                <div style="font-size:2.4vh;color:#b0c4d8;margin-top:0.5vh;">Força final: ${forcaFinal > 0 ? '+' : ''}${forcaFinal}</div>
-            `;
+/* =========================================================================
+   TELA DE RESUMO
+   ========================================================================= */
+function mostrarResumo(){
+  $('#resumo-nome').textContent = G.nacao.nome;
+  const govNome = GOVERNOS.find(g => g.id === G.nacao.governo).nome;
+  $('#resumo-info').textContent = `${G.nacao.continente} • ${govNome}`;
+  redesenharTodasBandeiras();
+  mostrarTela('tela-resumo');
+}
 
-            G.guerra = null;
+/* =========================================================================
+   GAMEPLAY — RENDERIZAÇÃO DE INDICADORES
+   ========================================================================= */
+function corBarraKarma(v){
+  if (v < 34) return `rgb(${200}, ${Math.round(40+v*2)}, 40)`;
+  if (v < 67) return `rgb(${Math.round(230-(v-34)*3)}, 200, 40)`;
+  return `rgb(${Math.max(50,230-(v-67)*6)}, 200, 70)`;
+}
+function renderTopbar(){
+  $('#topo-nome').textContent = G.nacao.nome;
+  const govNome = GOVERNOS.find(g => g.id === G.nacao.governo).nome;
+  $('#topo-info').textContent = `${G.nacao.continente} • ${govNome}`;
+  $('#topo-turno').textContent = G.turno;
+  redesenharTodasBandeiras();
+}
+function renderIndicadores(destacar){
+  const grid = $('#indicadores-grid');
+  grid.innerHTML = '';
+  IND_ORDEM.forEach(key => {
+    const meta = IND_META[key];
+    const valor = clamp(Math.round(G.indicadores[key]));
+    const div = document.createElement('div');
+    div.className = 'indicador';
+    if (destacar && destacar[key]){
+      div.classList.add(destacar[key] > 0 ? 'mudou-pos' : 'mudou-neg');
+    }
+    const cor = (key === 'k') ? corBarraKarma(valor) : meta.cor;
+    div.innerHTML = `
+      <div class="indicador-topo">
+        <span class="indicador-nome">${meta.emoji} ${meta.nome}</span>
+        <span class="indicador-valor">${valor}</span>
+      </div>
+      <div class="indicador-barra"><div class="indicador-fill" style="width:${valor}%; background:${cor};"></div></div>
+    `;
+    grid.appendChild(div);
+  });
+}
 
-            // Verificar fim de jogo
-            if (G.karma >= 100) { setTimeout(() => finalizarPartida(true), 1500); return; }
-            if (G.karma <= 0) { setTimeout(() => finalizarPartida(false), 1500); return; }
+/* =========================================================================
+   GAMEPLAY — SELEÇÃO E EXIBIÇÃO DE EVENTOS
+   ========================================================================= */
+function poolEventosDisponiveis(){
+  const governoEventos = EVENTOS_GOVERNO[G.nacao.governo] || [];
+  return [...EVENTOS_UNIVERSAIS, ...governoEventos];
+}
+function gerarEventoDiplomatico(){
+  const nacao = escolherAleatorio(G.nacoes);
+  const tipos = [
+    { tt:'Oferta de Comércio', em:'🤝', d:`${nacao.nome} propõe um novo acordo comercial bilateral, prometendo benefícios mútuos.`,
+      o:[
+        { t:'Aceitar o acordo comercial integralmente', e:{ri:8,ec:6}, rel:8 },
+        { t:'Negociar termos mais favoráveis', e:{ri:3,ec:3}, rel:3 },
+        { t:'Recusar por proteção à indústria local', e:{ec:4,ri:-5}, rel:-5 },
+        { t:'Propor acordo alternativo mais amplo', e:{ri:6,ec:2}, rel:6 },
+      ]},
+    { tt:'Tensão Diplomática', em:'⚡', d:`Autoridades de ${nacao.nome} fazem declarações hostis contra sua nação em fóruns internacionais.`,
+      o:[
+        { t:'Responder com diplomacia e moderação', e:{ri:4,k:3}, rel:6 },
+        { t:'Responder à altura, com firmeza', e:{fm:2,ri:-4}, rel:-6 },
+        { t:'Ignorar as provocações publicamente', e:{es:2}, rel:0 },
+        { t:'Buscar mediação de organismos internacionais', e:{ri:5,k:2}, rel:4 },
+      ]},
+    { tt:'Proposta de Aliança', em:'🛡️', d:`${nacao.nome} propõe uma aliança estratégica de defesa mútua.`,
+      o:[
+        { t:'Aceitar a aliança plenamente', e:{ri:8,fm:4}, rel:10 },
+        { t:'Aceitar cooperação limitada', e:{ri:4,fm:1}, rel:5 },
+        { t:'Recusar para manter independência', e:{es:2,ri:-3}, rel:-4 },
+        { t:'Propor pacto de não-agressão em vez disso', e:{ri:5}, rel:5 },
+      ]},
+    { tt:'Sanções Econômicas', em:'🚫', d:`${nacao.nome} ameaça impor sanções econômicas devido a divergências políticas.`,
+      o:[
+        { t:'Negociar para evitar as sanções', e:{ri:5,ec:-2}, rel:5 },
+        { t:'Aceitar as sanções e buscar autonomia', e:{ec:-8,es:3}, rel:-6 },
+        { t:'Retaliar com sanções próprias', e:{ec:-6,ri:-8,fm:2}, rel:-10 },
+        { t:'Buscar apoio de outras nações aliadas', e:{ri:4,ec:-2}, rel:2 },
+      ]},
+    { tt:'Cúpula Internacional', em:'🌐', d:`${nacao.nome} convida sua nação para uma cúpula internacional sobre cooperação global.`,
+      o:[
+        { t:'Participar ativamente e propor iniciativas', e:{ri:7,r:4}, rel:7 },
+        { t:'Participar de forma discreta', e:{ri:3}, rel:2 },
+        { t:'Enviar apenas representantes de baixo escalão', e:{ri:-2,r:-2}, rel:-2 },
+        { t:'Recusar o convite', e:{ri:-5,es:1}, rel:-5 },
+      ]},
+  ];
+  const modelo = escolherAleatorio(tipos);
+  return { id:'dip-'+Date.now(), tt:modelo.tt, em:modelo.em, d:modelo.d, o:modelo.o, diplomatico:true, nacaoAlvo:nacao.nome };
+}
+function selecionarProximoEvento(){
+  // 22% de chance de evento diplomático
+  if (Math.random() < 0.22){
+    return gerarEventoDiplomatico();
+  }
+  const pool = poolEventosDisponiveis();
+  let disponiveis = pool.filter(ev => !G.historicoEventosIds.includes(ev.id));
+  if (disponiveis.length === 0){
+    G.historicoEventosIds = [];
+    disponiveis = pool;
+  }
+  const escolhido = escolherAleatorio(disponiveis);
+  G.historicoEventosIds.push(escolhido.id);
+  if (G.historicoEventosIds.length > 15) G.historicoEventosIds.shift();
+  return escolhido;
+}
+function gerarEvento(){
+  if (G.fimJogo) return;
+  if (G.guerra) { iniciarTelaGuerra(); return; }
+  G.eventoAtual = selecionarProximoEvento();
+  G.opcaoEscolhidaIdx = null;
+  renderEvento();
+  mostrarTela('tela-jogo');
+}
+function renderEvento(){
+  const ev = G.eventoAtual;
+  if (!ev){
+    // Fallback de segurança: nunca deixar o card vazio
+    G.eventoAtual = { id:'fallback', tt:'Análise da Situação', em:'📋', d:'Sua equipe analisa o cenário atual do país.',
+      o:[{t:'Analisar a situação com calma', e:{es:2}},{t:'Convocar reunião de ministros', e:{es:1,ec:-1}},
+         {t:'Consultar a população', e:{k:2}},{t:'Manter o rumo atual', e:{}}] };
+  }
+  $('#evento-emoji').textContent = ev.em || '📋';
+  $('#evento-titulo-txt').textContent = ev.tt || 'Situação';
+  $('#evento-desc').textContent = ev.d || '';
+  const opcoesDiv = $('#evento-opcoes');
+  opcoesDiv.innerHTML = '';
+  const opcoes = (ev.o && ev.o.length) ? ev.o : [{t:'Analisar situação', e:{}}];
+  opcoes.forEach((op, idx) => {
+    const b = document.createElement('button');
+    b.className = 'btn opcao-btn';
+    b.textContent = op.t;
+    b.onclick = () => escolherOpcao(idx);
+    opcoesDiv.appendChild(b);
+  });
+  $('#resultado-box').classList.add('hidden');
+  $('#resultado-box').innerHTML = '';
+  $('#btn-proximo-turno').classList.add('hidden');
+}
+function escolherOpcao(idx){
+  if (G.opcaoEscolhidaIdx !== null) return; // evita cliques duplicados
+  G.opcaoEscolhidaIdx = idx;
+  const ev = G.eventoAtual;
+  const opcoes = (ev.o && ev.o.length) ? ev.o : [{t:'Analisar situação', e:{}}];
+  const opcao = opcoes[idx];
 
-            // Voltar ao jogo
-            setTimeout(() => {
-                mostrarTela('game-screen');
-                atualizarIndicadores();
-                G.waitingNextTurn = false;
-                document.getElementById('next-turn-btn').style.display = 'inline-block';
-                document.getElementById('next-turn-btn').onclick = () => proximoTurno();
-                // Mostrar resultado na área de eventos
-                document.getElementById('result-area').innerHTML = `
-                    <div class="result-box">
-                        <div style="font-size:2.6vh;font-weight:600;color:${venceu ? '#4caf84' : '#d45c5c'};">
-                            ${venceu ? '✅ Guerra vencida!' : '❌ Guerra perdida...'}
-                        </div>
-                        <div style="font-size:2.4vh;">${mensagem}</div>
-                    </div>
-                `;
-            }, 2000);
-        }
+  $all('#evento-opcoes .opcao-btn').forEach((b, i) => {
+    b.disabled = true;
+    if (i === idx) b.classList.add('escolhida');
+  });
 
-        // ---------- FINALIZAR PARTIDA ----------
-        function finalizarPartida(vitoria) {
-            mostrarTela('final-screen');
-            if (vitoria) {
-                document.getElementById('final-icon').textContent = '🏆';
-                document.getElementById('final-title').textContent = 'VITÓRIA!';
-                document.getElementById('final-message').textContent = `Sua nação, ${G.nome}, alcançou o Karma máximo em ${G.turno} turnos! Você governou com sabedoria.`;
-            } else {
-                document.getElementById('final-icon').textContent = '💀';
-                document.getElementById('final-title').textContent = 'DERROTA';
-                document.getElementById('final-message').textContent = `Sua nação, ${G.nome}, colapsou. O Karma chegou a zero. Tente novamente!`;
-            }
-        }
+  const efeitos = aplicarEfeitos(opcao.e || {});
 
-        // ---------- DESENHAR BANDEIRA ----------
-        function desenharBandeira(canvas, bandeira) {
-            const ctx = canvas.getContext('2d');
-            const w = canvas.width,
-                h = canvas.height;
-            ctx.clearRect(0, 0, w, h);
+  // Ajusta relação com nação-alvo em eventos diplomáticos
+  if (ev.diplomatico && ev.nacaoAlvo && typeof opcao.rel === 'number'){
+    const nacao = G.nacoes.find(n => n.nome === ev.nacaoAlvo);
+    if (nacao){
+      nacao.relacao = clamp(nacao.relacao + opcao.rel);
+      if (nacao.relacao > 60) nacao.atitude = 'amigavel';
+      else if (nacao.relacao < 30) nacao.atitude = 'hostil';
+      else nacao.atitude = 'neutra';
+    }
+  }
 
-            const cores = bandeira.cores || ['#1a3a5a', '#d4a050', '#1a3a5a'];
-            // Desenhar faixas horizontais
-            const faixas = 3;
-            const alt = h / faixas;
-            for (let i = 0; i < faixas; i++) {
-                ctx.fillStyle = cores[i % cores.length] || '#333';
-                ctx.fillRect(0, i * alt, w, alt);
-            }
+  registrarHistorico(ev.tt, opcao.t);
+  renderResultado(efeitos);
+  renderIndicadores(efeitos);
+  verificarGatilhoDeGuerra(opcao.t);
 
-            // Símbolo
-            const simbolo = bandeira.simbolo || 'none';
-            const corSimbolo = bandeira.simboloCor || '#f0c27a';
-            ctx.fillStyle = corSimbolo;
-            ctx.strokeStyle = corSimbolo;
-            ctx.lineWidth = 3;
-            const cx = w / 2,
-                cy = h / 2;
-            const tamanho = Math.min(w, h) * 0.3;
-            if (simbolo === 'star') {
-                ctx.font = `${tamanho * 1.2}px Arial`;
-                ctx.textAlign = 'center';
-                ctx.textBaseline = 'middle';
-                ctx.fillText('★', cx, cy);
-            } else if (simbolo === 'circle') {
-                ctx.beginPath();
-                ctx.arc(cx, cy, tamanho * 0.5, 0, 2 * Math.PI);
-                ctx.fill();
-            } else if (simbolo === 'diamond') {
-                ctx.beginPath();
-                ctx.moveTo(cx, cy - tamanho * 0.5);
-                ctx.lineTo(cx + tamanho * 0.5, cy);
-                ctx.lineTo(cx, cy + tamanho * 0.5);
-                ctx.lineTo(cx - tamanho * 0.5, cy);
-                ctx.closePath();
-                ctx.fill();
-            } else if (simbolo === 'cross') {
-                ctx.fillRect(cx - tamanho * 0.1, cy - tamanho * 0.5, tamanho * 0.2, tamanho);
-                ctx.fillRect(cx - tamanho * 0.5, cy - tamanho * 0.1, tamanho, tamanho * 0.2);
-            }
-            // 'none' não desenha nada
-        }
+  if (!checarFimDeJogo()){
+    if (G.guerra){
+      $('#btn-proximo-turno').textContent = '⚔️ Ir para o Front de Guerra ▶';
+      $('#btn-proximo-turno').classList.remove('hidden');
+      $('#btn-proximo-turno').onclick = () => { iniciarTelaGuerra(); };
+    } else {
+      $('#btn-proximo-turno').textContent = 'Próximo Turno ▶';
+      $('#btn-proximo-turno').classList.remove('hidden');
+      $('#btn-proximo-turno').onclick = proximoTurno;
+    }
+  }
+}
+function aplicarEfeitos(efeitosObj){
+  const aplicados = {};
+  Object.keys(efeitosObj).forEach(key => {
+    if (!IND_META[key]) return; // ignora chaves não-indicador (usadas na guerra)
+    const delta = efeitosObj[key];
+    G.indicadores[key] = clamp(G.indicadores[key] + delta);
+    aplicados[key] = delta;
+  });
+  return aplicados;
+}
+function renderResultado(efeitos){
+  const box = $('#resultado-box');
+  box.classList.remove('hidden');
+  const tagsHtml = Object.keys(efeitos).map(key => {
+    const meta = IND_META[key];
+    const delta = efeitos[key];
+    if (delta === 0) return '';
+    const cls = delta > 0 ? 'efeito-pos' : 'efeito-neg';
+    const sinal = delta > 0 ? '+' : '';
+    return `<span class="efeito-tag ${cls}">${meta.emoji} ${meta.nome} ${sinal}${delta}</span>`;
+  }).join('');
+  box.innerHTML = `<strong>Consequências da decisão:</strong><div>${tagsHtml || '<span style="color:var(--text-dim);">Nenhum efeito imediato perceptível.</span>'}</div>`;
+}
+function registrarHistorico(titulo, escolha){
+  G.historicoDecisoes.unshift({ turno:G.turno, titulo, escolha });
+  if (G.historicoDecisoes.length > 10) G.historicoDecisoes.pop();
+}
+function renderHistorico(){
+  const lista = $('#historico-lista');
+  if (!G.historicoDecisoes.length){
+    lista.innerHTML = '<p style="color:var(--text-dim);">Nenhuma decisão registrada ainda.</p>';
+    return;
+  }
+  lista.innerHTML = G.historicoDecisoes.map(h =>
+    `<div class="historico-item"><strong>Turno ${h.turno}:</strong> ${h.titulo}<br><span style="color:var(--text-dim);">→ ${h.escolha}</span></div>`
+  ).join('');
+}
 
-        // ---------- EDITOR DE BANDEIRA ----------
-        function initFlagEditor() {
-            const canvas = document.getElementById('flag-canvas');
-            const ctx = canvas.getContext('2d');
-            let bandeira = G.bandeira;
-            let cores = bandeira.cores;
-            let simbolo = bandeira.simbolo;
-            let simboloCor = bandeira.simboloCor;
-            let selectedPart = 0; // 0,1,2 faixas
+function proximoTurno(){
+  if (G.fimJogo) return;
+  G.turno += 1;
+  renderTopbar();
+  gerarEvento();
+}
 
-            // Paleta de cores
-            const paleta = ['#1a3a5a', '#d4a050', '#2a6a4a', '#b03a3a', '#3a4a6a', '#6a4a2a', '#1a1a1a', '#f0f0f0', '#4a7a9a',
-                '#9a4a6a', '#6a9a4a', '#c0a050'
-            ];
-            const picker = document.getElementById('color-picker');
-            picker.innerHTML = '';
-            paleta.forEach(c => {
-                const div = document.createElement('div');
-                div.className = 'color-swatch';
-                div.style.background = c;
-                div.addEventListener('click', () => {
-                    cores[selectedPart] = c;
-                    bandeira.cores = cores;
-                    desenharBandeira(canvas, bandeira);
-                    // Atualizar seleção visual
-                    document.querySelectorAll('.color-swatch').forEach(el => el.classList.remove('selected'));
-                    div.classList.add('selected');
-                });
-                picker.appendChild(div);
-            });
+/* =========================================================================
+   VERIFICAÇÃO DE FIM DE JOGO
+   ========================================================================= */
+function checarFimDeJogo(){
+  if (G.fimJogo) return true;
+  if (G.indicadores.k >= 100){
+    finalizarJogo('vitoria', 'A nação atingiu a harmonia máxima! O povo vive em paz, prosperidade e justiça sob sua liderança.');
+    return true;
+  }
+  if (G.indicadores.k <= 0){
+    finalizarJogo('derrota', 'O Karma da nação chegou ao fundo do poço. Crises, injustiças e o descontentamento popular derrubaram seu governo.');
+    return true;
+  }
+  return false;
+}
+function finalizarJogo(resultado, mensagem){
+  if (G.fimJogo) return; // evita chamadas duplicadas
+  G.fimJogo = true;
+  setTimeout(() => mostrarTelaFinal(resultado, mensagem), 900);
+}
+function mostrarTelaFinal(resultado, mensagem){
+  const titulo = $('#final-titulo');
+  if (resultado === 'vitoria'){
+    titulo.textContent = '🏆 VITÓRIA! Karma Máximo Alcançado';
+    titulo.style.color = 'var(--gold)';
+  } else if (resultado === 'derrota'){
+    titulo.textContent = '💔 DERROTA — O Governo Caiu';
+    titulo.style.color = 'var(--red)';
+  } else {
+    titulo.textContent = '🏁 FIM DE JOGO';
+    titulo.style.color = 'var(--gold)';
+  }
+  $('#final-msg').textContent = mensagem;
+  redesenharTodasBandeiras();
+  const statsDiv = $('#final-stats');
+  statsDiv.innerHTML = IND_ORDEM.map(key => {
+    const meta = IND_META[key];
+    return `<div class="badge"><div>${meta.emoji} ${meta.nome}</div><div class="valor">${clamp(Math.round(G.indicadores[key]))}</div></div>`;
+  }).join('') + `<div class="badge"><div>📅 Turnos Jogados</div><div class="valor">${G.turno}</div></div>`;
+  mostrarTela('tela-final');
+}
 
-            // Símbolos
-            document.querySelectorAll('#symbol-picker .sym-btn').forEach(btn => {
-                btn.addEventListener('click', () => {
-                    document.querySelectorAll('#symbol-picker .sym-btn').forEach(b => b.classList.remove('active'));
-                    btn.classList.add('active');
-                    simbolo = btn.dataset.symbol;
-                    bandeira.simbolo = simbolo;
-                    desenharBandeira(canvas, bandeira);
-                });
-            });
-            // Selecionar 'none' por padrão
-            document.querySelector('#symbol-picker .sym-btn[data-symbol="none"]')?.classList.add('active');
+/* =========================================================================
+   SISTEMA DE GUERRA
+   ========================================================================= */
+function palavrasAgressivas(texto){
+  const t = texto.toLowerCase();
+  return ['ataque','ataca','mobilizar','ameaça','ameacar','invasão','invasao','bombardeio','ofensiva'].some(p => t.includes(p));
+}
+function verificarGatilhoDeGuerra(textoOpcaoEscolhida){
+  if (G.guerra || G.fimJogo) return;
+  // Gatilho 1: relação com alguma nação caiu abaixo de 15
+  const nacoesHostis = G.nacoes.filter(n => n.relacao < 15);
+  let chance = 0;
+  let nacaoGatilho = null;
+  if (nacoesHostis.length){
+    chance += 0.30;
+    nacaoGatilho = escolherAleatorio(nacoesHostis);
+  }
+  // Gatilho 2: decisão agressiva do jogador
+  if (textoOpcaoEscolhida && palavrasAgressivas(textoOpcaoEscolhida)){
+    chance += 0.15;
+    if (!nacaoGatilho) nacaoGatilho = escolherAleatorio(G.nacoes.filter(n => n.atitude !== 'amigavel')) || escolherAleatorio(G.nacoes);
+  }
+  if (chance > 0 && Math.random() < chance && nacaoGatilho){
+    declararGuerra(nacaoGatilho);
+  }
+}
+function declararGuerra(nacaoInimiga){
+  const aliadosIniciais = G.nacoes.filter(n => n.relacao > 60).length;
+  G.guerra = {
+    nacaoInimiga: nacaoInimiga.nome,
+    faseIdx: 0, // índice em FASES_GUERRA (0-6)
+    economia: clamp(G.indicadores.ec),
+    forcaMilitar: clamp(G.indicadores.fm),
+    aliados: aliadosIniciais,
+    defesas: 40,
+    moral: 55,
+    baixas: 0,
+    recursos: 70,
+    forcaInimiga: clamp(nacaoInimiga.militar + rand(-8, 8)),
+    turnosGuerra: 0,
+    historico: [],
+    opcaoEscolhidaIdx: null,
+  };
+  registrarHistorico('⚔️ Declaração de Guerra', `${nacaoInimiga.nome} declarou guerra à nação!`);
+}
+function iniciarTelaGuerra(){
+  if (!G.guerra) { gerarEvento(); return; }
+  if (!G.guerra.historico) G.guerra.historico = []; // robustez
+  renderTelaGuerra();
+  mostrarTela('tela-guerra');
+}
+function renderTelaGuerra(){
+  const guerra = G.guerra;
+  if (!guerra) return;
+  $('#guerra-inimigo').textContent = `Conflito contra: ${guerra.nacaoInimiga}`;
+  const faseAtual = FASES_GUERRA[guerra.faseIdx];
+  $('#guerra-fase-badge').textContent = `Fase ${faseAtual.fase} de 7 — ${faseAtual.nome}`;
+  $('#guerra-fase-titulo').textContent = `${faseAtual.emoji} ${faseAtual.nome}`;
+  $('#guerra-fase-desc').textContent = faseAtual.desc;
 
-            // Clique no canvas para selecionar faixa
-            canvas.addEventListener('click', (e) => {
-                const rect = canvas.getBoundingClientRect();
-                const y = (e.clientY - rect.top) / rect.height;
-                const faixa = Math.floor(y * 3);
-                if (faixa >= 0 && faixa < 3) {
-                    selectedPart = faixa;
-                    // Destacar visualmente (não implementado para simplicidade)
-                    // Apenas atualiza a cor selecionada na paleta
-                    const corAtual = cores[faixa];
-                    document.querySelectorAll('.color-swatch').forEach(el => {
-                        el.classList.toggle('selected', el.style.background === corAtual);
-                    });
-                }
-            });
+  renderGuerraStats();
 
-            // Presets
-            document.getElementById('flag-preset-1').addEventListener('click', () => {
-                cores = ['#1a3a5a', '#d4a050', '#1a3a5a'];
-                bandeira.cores = cores;
-                bandeira.simbolo = 'none';
-                simbolo = 'none';
-                document.querySelectorAll('#symbol-picker .sym-btn').forEach(b => b.classList.remove('active'));
-                document.querySelector('#symbol-picker .sym-btn[data-symbol="none"]')?.classList.add('active');
-                desenharBandeira(canvas, bandeira);
-            });
-            document.getElementById('flag-preset-2').addEventListener('click', () => {
-                cores = ['#d4a050', '#1a3a5a', '#d4a050'];
-                bandeira.cores = cores;
-                bandeira.simbolo = 'star';
-                simbolo = 'star';
-                document.querySelectorAll('#symbol-picker .sym-btn').forEach(b => b.classList.remove('active'));
-                document.querySelector('#symbol-picker .sym-btn[data-symbol="star"]')?.classList.add('active');
-                desenharBandeira(canvas, bandeira);
-            });
-            document.getElementById('flag-preset-3').addEventListener('click', () => {
-                cores = ['#b03a3a', '#f0f0f0', '#b03a3a'];
-                bandeira.cores = cores;
-                bandeira.simbolo = 'cross';
-                simbolo = 'cross';
-                bandeira.simboloCor = '#d4a050';
-                document.querySelectorAll('#symbol-picker .sym-btn').forEach(b => b.classList.remove('active'));
-                document.querySelector('#symbol-picker .sym-btn[data-symbol="cross"]')?.classList.add('active');
-                desenharBandeira(canvas, bandeira);
-            });
-            document.getElementById('flag-preset-4').addEventListener('click', () => {
-                cores = ['#2a6a4a', '#f0c27a', '#2a6a4a'];
-                bandeira.cores = cores;
-                bandeira.simbolo = 'diamond';
-                simbolo = 'diamond';
-                bandeira.simboloCor = '#f0f0f0';
-                document.querySelectorAll('#symbol-picker .sym-btn').forEach(b => b.classList.remove('active'));
-                document.querySelector('#symbol-picker .sym-btn[data-symbol="diamond"]')?.classList.add('active');
-                desenharBandeira(canvas, bandeira);
-            });
+  const opcoesDiv = $('#guerra-opcoes');
+  opcoesDiv.innerHTML = '';
+  faseAtual.o.forEach((op, idx) => {
+    const b = document.createElement('button');
+    b.className = 'btn guerra-opcao';
+    b.textContent = op.t;
+    b.onclick = () => escolherOpcaoGuerra(idx);
+    opcoesDiv.appendChild(b);
+  });
+  $('#guerra-resultado').classList.add('hidden');
+  $('#guerra-resultado').innerHTML = '';
+  $('#btn-guerra-continuar').classList.add('hidden');
+  guerra.opcaoEscolhidaIdx = null;
+  renderGuerraLog();
+}
+function renderGuerraStats(){
+  const guerra = G.guerra;
+  const stats = [
+    { lbl:'💰 Economia de Guerra', val: clamp(Math.round(guerra.economia)) },
+    { lbl:'⚔️ Força Militar', val: clamp(Math.round(guerra.forcaMilitar || G.indicadores.fm)) },
+    { lbl:'🤝 Aliados', val: guerra.aliados },
+    { lbl:'🛡️ Defesas', val: clamp(Math.round(guerra.defesas)) },
+    { lbl:'💪 Moral das Tropas', val: clamp(Math.round(guerra.moral)) },
+    { lbl:'💀 Baixas', val: Math.max(0, Math.round(guerra.baixas)) },
+    { lbl:'🏴 Força Inimiga', val: clamp(Math.round(guerra.forcaInimiga)) },
+    { lbl:'📦 Recursos', val: clamp(Math.round(guerra.recursos)) },
+  ];
+  $('#guerra-stats').innerHTML = stats.map(s =>
+    `<div class="guerra-stat"><div class="lbl">${s.lbl}</div><div class="val">${s.val}</div></div>`
+  ).join('');
+}
+function escolherOpcaoGuerra(idx){
+  const guerra = G.guerra;
+  if (!guerra || guerra.opcaoEscolhidaIdx !== null) return;
+  guerra.opcaoEscolhidaIdx = idx;
+  const faseAtual = FASES_GUERRA[guerra.faseIdx];
+  const opcao = faseAtual.o[idx];
 
-            // Inicial
-            desenharBandeira(canvas, bandeira);
-            // Salvar referência para uso global
-            G._flagCanvas = canvas;
-            G._flagCtx = ctx;
-        }
+  $all('#guerra-opcoes .guerra-opcao').forEach((b, i) => {
+    b.disabled = true;
+    if (i === idx) b.classList.add('escolhida');
+  });
 
-        // ---------- TECLADO VIRTUAL ----------
-        function initKeyboard() {
-            const keys = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ'.split('');
-            const keyboard = document.getElementById('keyboard');
-            keyboard.innerHTML = '';
-            keys.forEach(k => {
-                const btn = document.createElement('button');
-                btn.className = 'key';
-                btn.textContent = k;
-                btn.addEventListener('click', () => {
-                    if (G.nome.length < 25) G.nome += k;
-                    document.getElementById('name-display').textContent = G.nome || 'DIGITE O NOME';
-                });
-                keyboard.appendChild(btn);
-            });
-            // Espaço
-            const space = document.createElement('button');
-            space.className = 'key key-space';
-            space.textContent = 'Espaço';
-            space.addEventListener('click', () => {
-                if (G.nome.length < 25) G.nome += ' ';
-                document.getElementById('name-display').textContent = G.nome || 'DIGITE O NOME';
-            });
-            keyboard.appendChild(space);
-            // Backspace
-            const back = document.createElement('button');
-            back.className = 'key key-back';
-            back.textContent = '⌫';
-            back.addEventListener('click', () => {
-                G.nome = G.nome.slice(0, -1);
-                document.getElementById('name-display').textContent = G.nome || 'DIGITE O NOME';
-            });
-            keyboard.appendChild(back);
-        }
+  // Aplica efeitos de indicadores globais
+  const efeitosGlobais = aplicarEfeitos(opcao.e || {});
+  // Aplica efeitos específicos da guerra
+  const e = opcao.e || {};
+  if (e.def) guerra.defesas = clamp(guerra.defesas + e.def);
+  if (e.moral) guerra.moral = clamp(guerra.moral + e.moral);
+  if (e.bx) guerra.baixas += e.bx;
+  if (e.rec) guerra.recursos = clamp(guerra.recursos + e.rec);
+  if (e.al) guerra.aliados = Math.max(0, guerra.aliados + e.al);
+  if (e.fi) guerra.forcaInimiga = clamp(guerra.forcaInimiga + e.fi);
+  guerra.economia = clamp(G.indicadores.ec);
+  guerra.forcaMilitar = clamp(G.indicadores.fm);
+  guerra.turnosGuerra += 1;
 
-        // ---------- INICIALIZAÇÃO ----------
-        function init() {
-            initKeyboard();
-            initFlagEditor();
+  // Cálculo de combate (imprevisibilidade)
+  const forcaAliada = (guerra.forcaMilitar*0.35 + guerra.economia*0.2 + guerra.moral*0.25 + guerra.recursos*0.2);
+  const diff = forcaAliada - guerra.forcaInimiga + rand(-10, 10);
+  let resultadoCombate;
+  if (diff > 12) resultadoCombate = 'Vantagem tática decisiva! Nossas forças avançam.';
+  else if (diff > 0) resultadoCombate = 'Ligeira vantagem em campo.';
+  else if (diff > -12) resultadoCombate = 'Combate equilibrado, sem vantagem clara.';
+  else resultadoCombate = 'Revés tático! O inimigo ganha terreno.';
 
-            // Botões de continente
-            document.querySelectorAll('.continent-btn').forEach(btn => {
-                btn.addEventListener('click', () => {
-                    G.continente = btn.dataset.continent;
-                    document.getElementById('continent-display').textContent = G.continente;
-                    document.querySelectorAll('.continent-btn').forEach(b => b.classList.remove('btn-primary'));
-                    btn.classList.add('btn-primary');
-                });
-            });
+  if (diff < -12){
+    guerra.moral = clamp(guerra.moral - 8);
+    guerra.defesas = clamp(guerra.defesas - 6);
+    guerra.baixas += rand(2, 6);
+  } else if (diff > 12){
+    guerra.forcaInimiga = clamp(guerra.forcaInimiga - 5);
+  }
 
-            // Botões de governo
-            document.querySelectorAll('.gov-btn').forEach(btn => {
-                btn.addEventListener('click', () => {
-                    G.governo = btn.dataset.gov;
-                    document.getElementById('gov-display').textContent = G.governo.charAt(0).toUpperCase() + G.governo.slice(1);
-                    document.querySelectorAll('.gov-btn').forEach(b => b.classList.remove('btn-primary'));
-                    btn.classList.add('btn-primary');
-                });
-            });
+  guerra.historico.unshift(`Fase ${faseAtual.fase} — ${opcao.t}: ${resultadoCombate}`);
+  if (guerra.historico.length > 8) guerra.historico.pop();
 
-            // Iniciar
-            document.getElementById('start-game-btn').addEventListener('click', iniciarJogo);
-            document.getElementById('start-game-btn-2').addEventListener('click', comecarPartida);
+  renderGuerraResultado(efeitosGlobais, resultadoCombate);
+  renderGuerraStats();
+  renderGuerraLog();
 
-            // Guerra opções
-            document.querySelectorAll('.war-opt').forEach(btn => {
-                btn.addEventListener('click', () => {
-                    escolherEstrategiaGuerra(btn.dataset.opt);
-                });
-            });
+  // Verifica derrota forçada por colapso de defesas/moral
+  let desfechoForcado = null;
+  if (guerra.moral <= 0 || guerra.defesas <= 0){
+    desfechoForcado = 'derrota';
+  } else if (guerra.forcaInimiga <= 0){
+    desfechoForcado = 'vitoria';
+  }
 
-            // Reiniciar
-            document.getElementById('restart-btn').addEventListener('click', () => {
-                // Resetar estado
-                G.nome = '';
-                G.continente = '';
-                G.governo = '';
-                G.karma = 50;
-                G.economia = 50;
-                G.respeito = 50;
-                G.qualidadeVida = 50;
-                G.estabilidade = 50;
-                G.relacoesInternacionais = 50;
-                G.turno = 0;
-                G.guerra = null;
-                G.eventosAnteriores = [];
-                G.flags = {};
-                G.waitingNextTurn = false;
-                document.getElementById('name-display').textContent = 'DIGITE O NOME';
-                document.getElementById('continent-display').textContent = 'Nenhum';
-                document.getElementById('gov-display').textContent = 'Nenhum';
-                document.querySelectorAll('.continent-btn, .gov-btn').forEach(b => b.classList.remove('btn-primary'));
-                // Reset bandeira
-                G.bandeira = { cores: ['#1a3a5a', '#d4a050', '#1a3a5a'], simbolo: 'none', simboloCor: '#f0c27a' };
-                desenharBandeira(document.getElementById('flag-canvas'), G.bandeira);
-                mostrarTela('creation-screen');
-            });
+  const btnContinuar = $('#btn-guerra-continuar');
+  btnContinuar.classList.remove('hidden');
 
-            // Iniciar com tela de criação
-            mostrarTela('creation-screen');
-        }
+  if (desfechoForcado === 'derrota'){
+    btnContinuar.textContent = 'Ver Consequências ▶';
+    btnContinuar.onclick = () => concluirGuerra('derrota');
+  } else if (desfechoForcado === 'vitoria'){
+    btnContinuar.textContent = 'Ver Consequências ▶';
+    btnContinuar.onclick = () => concluirGuerra('vitoria');
+  } else if (opcao.encerraGuerra === 'paz'){
+    btnContinuar.textContent = 'Selar a Paz ▶';
+    btnContinuar.onclick = () => concluirGuerra('paz');
+  } else if (opcao.encerraGuerra === 'derrota'){
+    btnContinuar.textContent = 'Ver Consequências ▶';
+    btnContinuar.onclick = () => concluirGuerra('derrota');
+  } else if (opcao.encerraGuerra === 'decisivo'){
+    btnContinuar.textContent = 'Ver Desfecho Final ▶';
+    btnContinuar.onclick = () => concluirGuerra(diff > 0 ? 'vitoria' : 'derrota');
+  } else if (guerra.faseIdx >= FASES_GUERRA.length - 1){
+    // Chegou ao fim da fase 7 sem opção de encerramento explícita (segurança)
+    btnContinuar.textContent = 'Ver Desfecho Final ▶';
+    btnContinuar.onclick = () => concluirGuerra(diff > 0 ? 'vitoria' : 'derrota');
+  } else {
+    btnContinuar.textContent = 'Avançar para a Próxima Fase ▶';
+    btnContinuar.onclick = avancarFaseGuerra;
+  }
 
-        // Inicializar quando a página carregar
-        window.onload = init;
-    </script>
+  if (checarFimDeJogo()){
+    btnContinuar.classList.add('hidden');
+  }
+}
+function renderGuerraResultado(efeitosGlobais, resultadoCombate){
+  const box = $('#guerra-resultado');
+  box.classList.remove('hidden');
+  const tagsHtml = Object.keys(efeitosGlobais).map(key => {
+    const meta = IND_META[key];
+    const delta = efeitosGlobais[key];
+    if (delta === 0) return '';
+    const cls = delta > 0 ? 'efeito-pos' : 'efeito-neg';
+    const sinal = delta > 0 ? '+' : '';
+    return `<span class="efeito-tag ${cls}">${meta.emoji} ${meta.nome} ${sinal}${delta}</span>`;
+  }).join('');
+  box.innerHTML = `<strong>🎯 ${resultadoCombate}</strong><div>${tagsHtml}</div>`;
+}
+function renderGuerraLog(){
+  const guerra = G.guerra;
+  if (!guerra || !guerra.historico){ $('#guerra-log').innerHTML = ''; return; }
+  $('#guerra-log').innerHTML = '<strong>📖 Relatório de Guerra:</strong><br>' +
+    guerra.historico.map(h => `<div>• ${h}</div>`).join('');
+}
+function avancarFaseGuerra(){
+  if (!G.guerra) return;
+  G.guerra.faseIdx = Math.min(G.guerra.faseIdx + 1, FASES_GUERRA.length - 1);
+  renderTelaGuerra();
+}
+function concluirGuerra(resultado){
+  if (!G.guerra) { gerarEvento(); return; }
+  if (resultado === 'vitoria'){
+    aplicarEfeitos({ k:30, r:10, ri:5 });
+    registrarHistorico('🏆 Fim da Guerra', `Vitória contra ${G.guerra.nacaoInimiga}!`);
+  } else if (resultado === 'derrota'){
+    aplicarEfeitos({ k:-25, r:-10, es:-8 });
+    registrarHistorico('💥 Fim da Guerra', `Derrota diante de ${G.guerra.nacaoInimiga}.`);
+  } else if (resultado === 'paz'){
+    aplicarEfeitos({ k:6, ri:6 });
+    registrarHistorico('🕊️ Fim da Guerra', `Paz selada com ${G.guerra.nacaoInimiga}.`);
+  }
+  // Restaura relação minimamente com o antigo inimigo após o fim do conflito
+  const nacao = G.nacoes.find(n => n.nome === G.guerra.nacaoInimiga);
+  if (nacao){
+    nacao.relacao = clamp(resultado === 'derrota' ? nacao.relacao + 5 : nacao.relacao + 20);
+    nacao.atitude = nacao.relacao > 60 ? 'amigavel' : (nacao.relacao < 30 ? 'hostil' : 'neutra');
+  }
+  G.guerra = null;
+  renderIndicadores();
+  if (!checarFimDeJogo()){
+    proximoTurno();
+  }
+}
+
+/* =========================================================================
+   INICIALIZAÇÃO E EVENT LISTENERS GERAIS
+   ========================================================================= */
+function iniciarPartida(){
+  redesenharTodasBandeiras();
+  renderTopbar();
+  renderIndicadores();
+  gerarEvento();
+  mostrarTela('tela-jogo');
+}
+function reiniciarJogo(){
+  estadoInicial();
+  faixaSelecionada = 0;
+  initTeclado();
+  atualizarNomeDisplay();
+  initContinentes();
+  initGovernos();
+  initEditorBandeira();
+  initEtapasNav();
+  irParaEtapa(1);
+  mostrarTela('tela-criacao');
+}
+
+function setupListeners(){
+  $('#btn-avancar-etapa').onclick = () => {
+    if (!validarEtapaAtual()) return;
+    if (G.etapaAtual < 4){
+      irParaEtapa(G.etapaAtual + 1);
+    } else {
+      mostrarResumo();
+    }
+  };
+  $('#btn-voltar-etapa').onclick = () => irParaEtapa(G.etapaAtual - 1);
+  $('#btn-comecar-governar').onclick = iniciarPartida;
+  $('#btn-historico').onclick = () => { renderHistorico(); $('#historico-painel').classList.remove('hidden'); };
+  $('#btn-fechar-historico').onclick = () => $('#historico-painel').classList.add('hidden');
+  $('#btn-jogar-novamente').onclick = reiniciarJogo;
+}
+
+document.addEventListener('DOMContentLoaded', () => {
+  initTeclado();
+  atualizarNomeDisplay();
+  initContinentes();
+  initGovernos();
+  initEditorBandeira();
+  initEtapasNav();
+  irParaEtapa(1);
+  setupListeners();
+  mostrarTela('tela-criacao');
+});
+
+</script>
 </body>
 </html>
